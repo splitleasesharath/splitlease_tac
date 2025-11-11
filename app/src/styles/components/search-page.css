@@ -630,6 +630,30 @@
 }
 
 /* ========================================
+   Listing Card Highlight Animation
+   Highlights card when clicked from map marker
+   PORTED FROM: input/search/js/app.js lines 1386-1398
+   ======================================== */
+@keyframes highlight-pulse {
+  0% {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(91, 33, 182, 0.3), 0 8px 16px rgba(0, 0, 0, 0.15);
+    transform: scale(1.02);
+  }
+  100% {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: scale(1);
+  }
+}
+
+.listing-card.highlight-pulse {
+  animation: highlight-pulse 1s ease-in-out 3;
+}
+
+/* ========================================
    Mobile Filter/Map Close Buttons - PORTED FROM ORIGINAL
    Based on: input/search/css/responsive.css lines 148-165, 262-279
    ======================================== */

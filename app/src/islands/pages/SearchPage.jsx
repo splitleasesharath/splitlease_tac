@@ -252,6 +252,21 @@ function PropertyCard({ listing, selectedDaysCount, onLocationClick, onOpenConta
   const hasImages = listing.images && listing.images.length > 0;
   const hasMultipleImages = listing.images && listing.images.length > 1;
 
+  // Load favorite status from localStorage on mount
+  // PORTED FROM: input/search/js/app.js lines 564-575
+  useEffect(() => {
+    const favoritesKey = 'splitlease_favorites';
+    try {
+      const storedFavorites = localStorage.getItem(favoritesKey);
+      if (storedFavorites) {
+        const favoritesArray = JSON.parse(storedFavorites);
+        setIsFavorite(favoritesArray.includes(listing.id));
+      }
+    } catch (err) {
+      console.error('Failed to load favorites from localStorage:', err);
+    }
+  }, [listing.id]);
+
   const handlePrevImage = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -273,7 +288,31 @@ function PropertyCard({ listing, selectedDaysCount, onLocationClick, onOpenConta
   const handleFavoriteClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsFavorite(!isFavorite);
+
+    const newFavoriteState = !isFavorite;
+    setIsFavorite(newFavoriteState);
+
+    // Persist to localStorage
+    // PORTED FROM: input/search/js/app.js lines 564-575
+    const favoritesKey = 'splitlease_favorites';
+    try {
+      const storedFavorites = localStorage.getItem(favoritesKey);
+      let favoritesArray = storedFavorites ? JSON.parse(storedFavorites) : [];
+
+      if (newFavoriteState) {
+        // Add to favorites if not already present
+        if (!favoritesArray.includes(listing.id)) {
+          favoritesArray.push(listing.id);
+        }
+      } else {
+        // Remove from favorites
+        favoritesArray = favoritesArray.filter(id => id !== listing.id);
+      }
+
+      localStorage.setItem(favoritesKey, JSON.stringify(favoritesArray));
+    } catch (err) {
+      console.error('Failed to save favorites to localStorage:', err);
+    }
   };
 
   // Calculate dynamic price based on selected days
@@ -329,6 +368,7 @@ function PropertyCard({ listing, selectedDaysCount, onLocationClick, onOpenConta
   return (
     <a
       className="listing-card"
+      data-listing-id={listing.id}
       href={`/view-split-lease/${listing.id}`}
       target="_blank"
       rel="noopener noreferrer"
@@ -1207,8 +1247,37 @@ export default function SearchPage() {
             selectedListing={null}
             selectedBorough={selectedBorough}
             onMarkerClick={(listing) => {
-              console.log('Marker clicked:', listing.title);
-              // Could open listing in new tab or show details
+              // PORTED FROM: input/search/js/app.js lines 1362-1415
+              // Scroll to listing card when map marker is clicked
+              if (import.meta.env.DEV) {
+                console.log('Map marker clicked, scrolling to listing:', listing.title);
+              }
+
+              const listingCard = document.querySelector(`[data-listing-id="${listing.id}"]`);
+              if (listingCard) {
+                // Scroll card into view with smooth behavior
+                listingCard.scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'center'
+                });
+
+                // Add highlight animation
+                listingCard.classList.add('highlight-pulse');
+                setTimeout(() => {
+                  listingCard.classList.remove('highlight-pulse');
+                }, 3000);
+              } else {
+                // Card not loaded yet (lazy loading) - load more until visible
+                if (import.meta.env.DEV) {
+                  console.log('Listing card not in DOM yet, may need to load more listings');
+                }
+                // Could trigger loading more listings here if needed
+              }
+
+              // On mobile, ensure listings section is visible
+              if (window.innerWidth < 768) {
+                setMapSectionActive(false);
+              }
             }}
           />
 
