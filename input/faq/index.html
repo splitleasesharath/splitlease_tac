@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Split Lease - FAQ. Find answers to frequently asked questions about flexible periodic tenancy solutions in NYC.">
+    <title>Split Lease - FAQ | Frequently Asked Questions</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <!-- Header Navigation -->
+    <header class="main-header">
+        <nav class="nav-container">
+            <div class="nav-left">
+                <a href="https://splitlease.app" class="logo">
+                    <img src="assets/images/logo.png" alt="Split Lease" class="logo-image">
+                    <span class="logo-text">Split Lease</span>
+                </a>
+            </div>
+            <button class="hamburger-menu" aria-label="Toggle navigation menu" onclick="toggleMobileMenu()">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+            <div class="nav-center">
+                <div class="nav-dropdown">
+                    <a href="#host" class="nav-link dropdown-trigger" role="button" aria-expanded="false" aria-haspopup="true"><span class="mobile-text">Host</span><span class="desktop-text">Host with Us</span>
+                        <svg class="dropdown-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+                            <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </a>
+                    <div class="dropdown-menu" role="menu" aria-label="Host with Us menu">
+                        <a href="https://app.split.lease/host-step-by-step-guide-to-list" class="dropdown-item" role="menuitem">
+                            <span class="dropdown-title">Why List with Us</span>
+                            <span class="dropdown-desc">New to Split Lease? Learn more about hosting</span>
+                        </a>
+                        <a href="https://app.split.lease/success-stories-guest" class="dropdown-item" role="menuitem">
+                            <span class="dropdown-title">Success Stories</span>
+                            <span class="dropdown-desc">Explore other hosts' feedback</span>
+                        </a>
+                        <a href="https://app.split.lease/signup-login" class="dropdown-item" role="menuitem">
+                            <span class="dropdown-title">List Property</span>
+                        </a>
+                        <a href="https://app.split.lease/policies/cancellation-and-refund-policy" class="dropdown-item" role="menuitem">
+                            <span class="dropdown-title">Legal Information</span>
+                            <span class="dropdown-desc">Review most important policies</span>
+                        </a>
+                        <a href="https://app.split.lease/faq" class="dropdown-item" role="menuitem">
+                            <span class="dropdown-title">FAQs</span>
+                            <span class="dropdown-desc">Frequently Asked Questions</span>
+                        </a>
+                        <a href="https://app.split.lease/signup-login" class="dropdown-item" role="menuitem">
+                            <span class="dropdown-title">Sign Up</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="nav-dropdown">
+                    <a href="#stay" class="nav-link dropdown-trigger" role="button" aria-expanded="false" aria-haspopup="true"><span class="mobile-text">Guest</span><span class="desktop-text">Stay with Us</span>
+                        <svg class="dropdown-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+                            <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </a>
+                    <div class="dropdown-menu" role="menu" aria-label="Stay with Us menu">
+                        <a href="https://app.split.lease/search" class="dropdown-item" role="menuitem">
+                            <span class="dropdown-title">Explore Rentals</span>
+                            <span class="dropdown-desc">See available listings!</span>
+                        </a>
+                        <a href="https://app.split.lease/success-stories-guest" class="dropdown-item" role="menuitem">
+                            <span class="dropdown-title">Success Stories</span>
+                            <span class="dropdown-desc">Explore other guests' feedback</span>
+                        </a>
+                        <a href="https://app.split.lease/faq" class="dropdown-item" role="menuitem">
+                            <span class="dropdown-title">FAQs</span>
+                            <span class="dropdown-desc">Frequently Asked Questions</span>
+                        </a>
+                        <a href="https://app.split.lease/signup-login" class="dropdown-item" role="menuitem">
+                            <span class="dropdown-title">Sign Up</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-right">
+                <a href="https://app.split.lease/search" class="explore-rentals-btn">Explore Rentals</a>
+                <a href="javascript:void(0)" class="nav-link" onclick="openAuthModal(); return false;">Sign In</a>
+                <span class="divider">|</span>
+                <a href="javascript:void(0)" class="nav-link" onclick="openAuthModal(); return false;">Sign Up</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1 class="hero-title">Hi there! How can we help you?</h1>
+        <p class="hero-subtitle">Select one of our pre-sorted categories</p>
+    </section>
+
+    <!-- Tab Navigation -->
+    <div class="tabs-container">
+        <div class="tabs">
+            <button class="tab active" data-tab="general">General Questions</button>
+            <button class="tab" data-tab="travelers">For Travelers</button>
+            <button class="tab" data-tab="hosts">For Hosts</button>
+        </div>
+    </div>
+
+    <!-- FAQ Content -->
+    <main class="faq-container">
+        <!-- Loading State -->
+        <div id="loading-state" class="loading-container">
+            <div class="spinner"></div>
+            <p>Loading FAQs...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-state" class="error-container" style="display: none;">
+            <p class="error-message">Unable to load FAQs. Please try again later.</p>
+            <button onclick="loadFAQs()" class="retry-btn">Retry</button>
+        </div>
+
+        <!-- General Questions Tab -->
+        <div class="tab-content active" id="general">
+            <!-- FAQs will be loaded dynamically here -->
+        </div>
+
+        <!-- For Travelers Tab -->
+        <div class="tab-content" id="travelers">
+            <!-- FAQs will be loaded dynamically here -->
+        </div>
+
+        <!-- For Hosts Tab -->
+        <div class="tab-content" id="hosts">
+            <!-- FAQs will be loaded dynamically here -->
+        </div>
+    </main>
+
+    <!-- Bottom CTA -->
+    <section class="bottom-cta">
+        <a href="#" class="cta-link">Can't find the answer to your question?</a>
+    </section>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-column">
+                <h4>For Hosts</h4>
+                <a href="https://app.split.lease/signup-login">List Property Now</a>
+                <a href="https://app.split.lease/host-step-by-step-guide-to-list">How to List</a>
+                <a href="https://app.split.lease/policies/cancellation-and-refund-policy">Legal Section</a>
+                <a href="https://app.split.lease/host-guarantees">Guarantees</a>
+                <a href="https://app.split.lease/demo-house-manual">Free House Manual</a>
+            </div>
+            <div class="footer-column">
+                <h4>For Guests</h4>
+                <a href="https://app.split.lease/search">Explore Split Leases</a>
+                <a href="https://app.split.lease/success-stories-guest">Success Stories</a>
+                <a href="https://app.split.lease/signup-login">Speak to an Agent</a>
+                <a href="https://app.split.lease/faq">View FAQ</a>
+            </div>
+            <div class="footer-column">
+                <h4>Company</h4>
+                <a href="https://app.split.lease/periodic-tenancy">About Periodic Tenancy</a>
+                <a href="https://app.split.lease/team">About the Team</a>
+                <a href="https://app.split.lease/careers">Careers at Split Lease</a>
+                <a href="https://app.split.lease/blog">View Blog</a>
+            </div>
+            <div class="footer-column">
+                <h4>Refer a friend</h4>
+                <p class="referral-text">You get $50 and they get $50 *after their first booking</p>
+                <div class="referral-options">
+                    <label><input type="radio" name="referral" value="text"> Text</label>
+                    <label><input type="radio" name="referral" value="email"> Email</label>
+                </div>
+                <input type="text" placeholder="Your friend's" class="referral-input">
+                <button class="share-btn">Share now</button>
+            </div>
+            <div class="footer-column">
+                <h4>Import your listing from another site</h4>
+                <p class="import-text">No need to start from scratch</p>
+                <input type="text" placeholder="https://your-listing-link" class="import-input" id="importUrl">
+                <input type="email" placeholder="janedoe@your_email.com" class="import-input" id="importEmail">
+                <button class="import-btn" onclick="handleImportListing()">Submit</button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- App Download Section (Outside Footer) -->
+    <div class="app-download-section">
+            <div class="app-card">
+                <img src="https://50bf0464e4735aabad1cc8848a0e8b8a.cdn.bubble.io/cdn-cgi/image/w=256,h=330,f=auto,dpr=1,fit=contain/f1743107051105x956510081926083000/iphone-removebg-preview.png" alt="Split Lease App" class="app-phone-image" loading="lazy">
+                <div class="app-content">
+                    <p class="app-tagline">Now you can change<br>your nights<br><em>on the go.</em></p>
+                    <a href="https://apps.apple.com/app/split-lease" class="app-store-btn">
+                        <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store" height="40">
+                    </a>
+                    <p class="app-subtitle">Download at the App Store</p>
+                </div>
+            </div>
+
+            <div class="alexa-card">
+                <img src="https://50bf0464e4735aabad1cc8848a0e8b8a.cdn.bubble.io/cdn-cgi/image/w=256,h=225,f=auto,dpr=1,fit=cover,q=75/f1625329487406x361063433051586300/402087-smart-speakers-amazon-echo-dot-4th-gen-10015594%201.png" alt="Amazon Alexa" class="alexa-device-image" loading="lazy">
+                <div class="alexa-content">
+                    <p class="alexa-tagline">Voice-controlled concierge,<br>at your service.</p>
+                    <a href="https://www.amazon.com/dp/B08XYZ123" class="alexa-btn">
+                        <span class="amazon-logo">Available on<br><strong>amazon.com</strong></span>
+                    </a>
+                    <p class="alexa-command">"Alexa, enable Split Lease"</p>
+                </div>
+            </div>
+    </div>
+
+    <!-- Footer Bottom -->
+    <div class="footer-bottom">
+            <a href="https://app.split.lease/terms">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" style="margin-right: 0.5rem;">
+                    <path d="M2 2h8v8H2z" stroke="currentColor" stroke-width="1" fill="none"/>
+                    <path d="M4 6h4M4 8h3"/>
+                </svg>
+                Terms of Use
+            </a>
+            <span>Made with love in New York City</span>
+            <span>© 2025 SplitLease</span>
+    </div>
+
+    <!-- Floating Market Research Widget -->
+    <div class="market-research-widget" id="marketWidget">
+        <button class="close-widget" aria-label="Close">&times;</button>
+        <div class="widget-header">
+            <span class="lightbulb-icon">💡</span>
+            <h3>Market Research Report</h3>
+            <span class="free-badge">Free</span>
+        </div>
+        <textarea placeholder="ex. I need a quiet space near downtown, weekly from Monday to Friday, I commute to the city on a weekly basis. Send to (415) 555-5555 and guest@mail.com"></textarea>
+        <button class="next-btn">Next</button>
+        <div class="vertical-text">Free Market Research</div>
+    </div>
+
+    <!-- Floating AI Chat Widget -->
+    <div class="ai-chat-widget">
+        <div class="chat-tooltip">
+            <p>Exploring the FAQ? I can help if you need <strong>quick answers</strong>.</p>
+            <button class="explore-btn">Explore Split Lease benefits and guides</button>
+        </div>
+        <div class="chat-input-container">
+            <div class="avatar"></div>
+            <input type="text" placeholder="Ask AI" class="ai-input">
+            <button class="voice-btn" aria-label="Voice input">🎤</button>
+        </div>
+    </div>
+
+    <!-- Floating Chat Button -->
+    <button class="floating-chat-btn" aria-label="Open chat">💬</button>
+
+    <script src="script.js"></script>
+</body>
+</html>
