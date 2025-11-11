@@ -76,3 +76,13 @@ bun.lockb
 
 # Context directory
 Context/
+
+# Input directory
+input/
+
+# Dump directory
+dump/
+
+# Playwright MCP directory
+.playwright/
+playwright-mcp/
