@@ -1,6 +1,6 @@
-# Split Lease Search Page
+# Split Lease TAC (Temporary Accommodations & Co-living)
 
-A modern, high-performance property search application for flexible shared accommodations with weekly scheduling. Built with vanilla JavaScript and React islands architecture, powered by Supabase and Google Maps.
+A modern, high-performance property search and booking application for flexible shared accommodations with weekly scheduling. Built with React Islands Architecture, ESM-only modules, Vite build system, and deployed on Cloudflare Pages. Powered by Supabase PostgreSQL and Google Maps.
 
 ## 📋 Table of Contents
 
@@ -19,16 +19,18 @@ A modern, high-performance property search application for flexible shared accom
 
 ## 🎯 Overview
 
-Split Lease Search is a progressive web application that enables users to find and filter shared accommodations across NYC and New Jersey with flexible weekly scheduling. The platform features advanced filtering, dynamic pricing based on stay duration, interactive maps, and AI-powered market research.
+Split Lease TAC is a multi-page web application that enables users to find, filter, and book shared accommodations across NYC and New Jersey with flexible weekly scheduling. The platform features advanced filtering, dynamic pricing based on stay duration, interactive maps, and AI-powered market research.
 
 ### What Makes It Special
 
+- **ESM-Only Architecture**: Strict ES modules with explicit .js/.jsx extensions—no CommonJS, no build complexity
+- **React Islands Pattern**: Selective hydration for interactive components only—fast initial loads
+- **Vite Build System**: Lightning-fast development with Hot Module Replacement (HMR)
+- **Multi-Page Application**: 8 separate HTML entry points for optimal SEO and page load performance
 - **100% Database-Driven Filtering**: All location data loaded dynamically from Supabase—no hardcoded values
 - **Intelligent Pricing**: Real-time price calculations based on selected nights (2-7 nights)
-- **Advanced Schedule Selector**: React-powered UI with contiguous day validation
-- **Lazy Loading**: Fast initial page load with progressive content rendering (6 listings per batch)
-- **Offline Capability**: IndexedDB backup for resilient performance
-- **Mobile-First Design**: Fully responsive across all device sizes
+- **Cloudflare Pages Deployment**: Global edge network for low latency worldwide
+- **TypeScript for Safety**: React components written in TypeScript for type safety
 
 ---
 
@@ -88,8 +90,8 @@ Split Lease Search is a progressive web application that enables users to find a
 
 ### Prerequisites
 
+- **Node.js 18+** and npm
 - Modern web browser (Chrome, Firefox, Safari, Edge)
-- Python 3.x (for local development server) OR any HTTP server
 - API keys (see [Detailed Setup](#detailed-setup))
 
 ### 5-Minute Setup
@@ -97,22 +99,25 @@ Split Lease Search is a progressive web application that enables users to find a
 ```bash
 # 1. Clone the repository
 git clone <repository-url>
-cd search-page-2
+cd "TAC - Split Lease/app"
 
-# 2. Create configuration file
-# Create js/config.local.js with your API keys:
-cat > js/config.local.js << 'EOF'
-window.ENV = window.ENV || {};
-window.ENV.SUPABASE_ANON_KEY = 'your_supabase_anon_key_here';
-window.ENV.GOOGLE_MAPS_API_KEY = 'your_google_maps_key_here';
-window.ENV.BUBBLE_API_KEY = 'your_bubble_api_key_here';
+# 2. Install dependencies
+npm install
+
+# 3. Create environment configuration
+# Create .env file with your API keys:
+cat > .env << 'EOF'
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key_here
+VITE_GOOGLE_MAPS_API_KEY=your_google_maps_key_here
+VITE_BUBBLE_API_KEY=your_bubble_api_key_here
 EOF
 
-# 3. Start local server
-python -m http.server 8000
+# 4. Start Vite development server
+npm run dev
 
-# 4. Open in browser
-# Navigate to http://localhost:8000
+# 5. Open in browser
+# Navigate to http://localhost:5173
 ```
 
 **Note**: You'll need to replace the placeholder API keys with actual values. See [Detailed Setup](#detailed-setup) for how to obtain them.
@@ -123,23 +128,23 @@ python -m http.server 8000
 
 ### 1. Environment Configuration
 
-Create `js/config.local.js` in the project root (this file is git-ignored):
+Create `.env` file in the `app/` directory (this file is git-ignored):
 
-```javascript
-window.ENV = window.ENV || {};
+```bash
+# Supabase Configuration
+VITE_SUPABASE_URL=https://qcfifybkaddcoimjroca.supabase.co
+VITE_SUPABASE_ANON_KEY=your_actual_supabase_anon_key
 
-// Supabase Configuration
-window.ENV.SUPABASE_URL = 'https://qcfifybkaddcoimjroca.supabase.co';
-window.ENV.SUPABASE_ANON_KEY = 'your_actual_supabase_anon_key';
+# Google Maps API
+VITE_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
 
-// Google Maps API
-window.ENV.GOOGLE_MAPS_API_KEY = 'your_google_maps_api_key';
-
-// Bubble.io Configuration (optional for contact features)
-window.ENV.BUBBLE_API_KEY = 'your_bubble_api_key';
-window.ENV.BUBBLE_API_BASE_URL = 'https://app.split.lease/api/1.1';
-window.ENV.BUBBLE_MESSAGING_ENDPOINT = 'https://app.split.lease/api/1.1/wf/core-contact-host-send-message';
+# Bubble.io Configuration (optional for contact features)
+VITE_BUBBLE_API_KEY=your_bubble_api_key
+VITE_BUBBLE_API_BASE_URL=https://app.split.lease/api/1.1
+VITE_BUBBLE_MESSAGING_ENDPOINT=https://app.split.lease/api/1.1/wf/core-contact-host-send-message
 ```
+
+**Important**: All environment variables must be prefixed with `VITE_` to be accessible in client-side code.
 
 ### 2. Obtain API Keys
 
@@ -188,37 +193,55 @@ The application connects to an existing Supabase database. If you need to set up
 
 See [TECHNICAL_REFERENCE.md](./TECHNICAL_REFERENCE.md) for complete schema details.
 
-### 4. Install Dependencies (Optional)
+### 4. Install Dependencies
 
-For React component development:
+Install all required dependencies:
 
 ```bash
+cd app
 npm install
 ```
 
-**Dependencies**:
-- `react@18.2.0` - React library
+**Core Dependencies**:
+- `react@18.2.0` - React library for Islands
 - `react-dom@18.2.0` - React DOM renderer
-- `styled-components@6.1.0` - CSS-in-JS styling
-- `playwright@1.55.1` - Testing framework
+- `@supabase/supabase-js@^2.38.0` - Supabase client
+- `framer-motion@12.23.24` - Animation library
+- `lucide-react@0.553.0` - Icon library
+- `lottie-react@2.4.1` - Lottie animations
 
-### 5. Build React Components (Optional)
+**Dev Dependencies**:
+- `vite@^5.0.0` - Build tool and dev server
+- `@vitejs/plugin-react@^4.2.0` - Vite React plugin
 
-If modifying the Schedule Selector or other React components:
+### 5. Development Workflow
+
+Start the Vite development server:
 
 ```bash
-# One-time build
-npm run build:components
-
-# Watch mode for development
-npm run dev:components
+npm run dev
 ```
 
-Output: `dist/schedule-selector.js`
+This will:
+- Start dev server on port 5173
+- Enable Hot Module Replacement (HMR)
+- Compile React Islands on-the-fly
+- Make all 8 HTML entry points available
 
 ### 6. Production Deployment
 
-#### Option A: Static Hosting (Netlify, Vercel, Cloudflare Pages)
+#### Option A: Cloudflare Pages (Recommended)
+
+1. Connect GitHub repository to Cloudflare Pages
+2. Build settings:
+   - **Build command**: `npm run build`
+   - **Build output directory**: `dist`
+   - **Root directory**: `app`
+3. Environment variables:
+   - Add `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, etc. in Cloudflare dashboard
+4. Deploy triggers automatically on git push
+
+#### Option B: Static Hosting (Netlify, Vercel)
 
 ```bash
 # Build production assets
@@ -227,23 +250,26 @@ npm run build
 # Deploy dist/ folder to your hosting provider
 ```
 
-#### Option B: Traditional Web Server (Apache, Nginx)
+Build configuration:
+- Build command: `npm run build`
+- Publish directory: `app/dist`
+- Node version: 18+
 
-1. Copy all files to web root
-2. Ensure `js/config.local.js` exists with production keys
+#### Option C: Traditional Web Server (Apache, Nginx)
+
+1. Build the application: `npm run build`
+2. Copy `dist/` folder contents to web root
 3. Configure HTTPS (required for geolocation and some APIs)
 4. Set cache headers for static assets
+5. Add rewrite rules for Cloudflare Functions routes
 
 #### Environment-Specific Configuration
 
-For different environments (dev/staging/prod), use build scripts:
-
-```bash
-# Generate config from environment variables
-node build-cloudflare.js
-```
-
-This replaces placeholders in `config.js.template` with actual environment variables.
+Vite automatically loads environment variables from `.env` files:
+- `.env` - All environments
+- `.env.local` - Local overrides (gitignored)
+- `.env.production` - Production only
+- `.env.development` - Development only
 
 ---
 
@@ -293,73 +319,98 @@ This replaces placeholders in `config.js.template` with actual environment varia
 #### Project Structure
 
 ```
-search-page-2/
-├── index.html                 # Main entry point
-├── js/                        # JavaScript modules
-│   ├── app.js                 # Core application logic (1,592 lines)
-│   ├── supabase-api.js        # Database client (537 lines)
-│   ├── filter-config.js       # Dynamic filter configuration (283 lines)
-│   ├── config.js              # Environment config
-│   └── ...                    # Supporting modules
-├── css/                       # Stylesheets
-│   ├── styles.css             # Main styles
-│   ├── responsive.css         # Media queries
-│   └── ai-signup.css          # Modal styles
-├── components/                # React components
-│   ├── ScheduleSelector/      # Day picker component
-│   ├── ContactHost/           # Messaging modal
-│   └── AiSignup/              # Research signup
-├── assets/                    # Images and animations
-└── dist/                      # Built components
+app/
+├── public/                    # Static HTML entry points
+│   ├── index.html             # Homepage
+│   ├── search.html            # Property search page
+│   ├── view-split-lease.html  # Listing detail page
+│   ├── faq.html               # FAQ page
+│   ├── policies.html          # Policies page
+│   ├── list-with-us.html      # Host onboarding
+│   ├── success-stories.html   # Testimonials
+│   ├── why-split-lease.html   # Value proposition
+│   ├── assets/                # Images, fonts, lotties
+│   └── _redirects             # Cloudflare routing rules
+├── src/                       # React source code
+│   ├── islands/               # React Islands components
+│   │   ├── pages/             # Page-level components
+│   │   │   ├── HomePage.jsx
+│   │   │   ├── SearchPage.jsx
+│   │   │   └── ViewSplitLeasePage.jsx
+│   │   └── shared/            # Reusable components
+│   │       ├── Header.jsx
+│   │       ├── Footer.jsx
+│   │       ├── DaySelector.jsx
+│   │       └── GoogleMap.jsx
+│   ├── lib/                   # Utility libraries
+│   │   ├── supabase.js        # Supabase client
+│   │   ├── constants.js       # App constants
+│   │   ├── dataLookups.js     # Location lookups
+│   │   └── urlParams.js       # URL state management
+│   └── styles/                # CSS stylesheets
+│       └── main.css
+├── functions/                 # Cloudflare Functions
+│   └── view-split-lease/[id].js
+├── dist/                      # Vite build output (gitignored)
+├── vite.config.js             # Vite configuration
+├── package.json               # "type": "module"
+└── .env                       # Environment variables (gitignored)
 ```
 
 #### Key Files & Line Numbers
 
-- **`js/app.js:534`** - `applyFilters()` - Main filter logic
-- **`js/app.js:16`** - `calculateDynamicPrice()` - Pricing calculations
-- **`js/supabase-api.js:46`** - `getListings()` - Database queries
-- **`js/supabase-api.js:191`** - `transformListing()` - Data transformation
-- **`js/filter-config.js:283`** - Dynamic filter configuration
-- **`components/ScheduleSelector/SearchScheduleSelector.tsx:400`** - React day picker
+- **`src/islands/pages/SearchPage.jsx`** - Main search page component with filtering logic
+- **`src/islands/shared/DaySelector.jsx`** - Interactive 7-day schedule picker
+- **`src/lib/supabase.js`** - Supabase client initialization
+- **`src/lib/constants.js`** - Application constants (138+ lines)
+- **`src/lib/dataLookups.js`** - Borough/neighborhood lookup utilities
+- **`src/lib/urlParams.js`** - URL state synchronization
+- **`vite.config.js`** - Vite build configuration with multi-page setup
 
 #### Adding New Features
 
 **Add a New Filter**:
 
-1. Update `filter-config.js` to include new filter type
-2. Add UI element in `index.html`
-3. Wire event listener in `app.js:setupEventListeners()`
-4. Update `applyFilters()` in `app.js:534` to handle new filter
-5. Modify `SupabaseAPI.getListings()` to apply database filter
+1. Update `SearchPage.jsx` to include new filter state
+2. Add UI element in `search.html` and wire up React Island
+3. Update Supabase query logic in `SearchPage.jsx`
+4. Add filter to URL params in `urlParams.js` for sharing
 
 **Add a New Listing Field**:
 
 1. Ensure field exists in Supabase `listing` table
-2. Update `SupabaseAPI.transformListing()` in `supabase-api.js:191` to map field
-3. Update `createListingCard()` in `app.js` to display field
-4. Add CSS styling in `css/styles.css`
+2. Update `SearchPage.jsx` to fetch and display the field
+3. Add to listing card component rendering
+4. Add CSS styling in `src/styles/`
 
-**Modify Schedule Selector**:
+**Modify React Island Components**:
 
-1. Edit `components/ScheduleSelector/SearchScheduleSelector.tsx`
-2. Build with `npm run build:components`
-3. Test integration with `js/schedule-selector-integration.js`
+1. Edit the component in `src/islands/shared/` or `src/islands/pages/`
+2. Vite automatically rebuilds with HMR (no manual build needed)
+3. Test changes immediately in browser
 
 #### Development Workflow
 
 ```bash
-# 1. Start development server
-python -m http.server 8000
+# 1. Start Vite development server (with HMR)
+npm run dev
 
-# 2. Watch React components (in separate terminal)
-npm run dev:components
+# 2. Make changes to any files:
+#    - React Island components (.jsx) - instant HMR
+#    - Utility libraries (.js) - instant HMR
+#    - CSS files - instant HMR
+#    - HTML files - browser refresh
 
-# 3. Make changes to files
-# 4. Refresh browser to see updates
+# 3. Changes appear automatically in browser (no manual refresh needed)
 
-# 5. For JavaScript changes - no build needed
-# 6. For React component changes - auto-rebuilt by watch mode
+# 4. Build for production when ready
+npm run build
+
+# 5. Test production build locally
+npm run preview
 ```
+
+**No separate build step needed** - Vite handles everything!
 
 #### Testing
 
@@ -378,28 +429,34 @@ npx playwright test --headed
 
 ## 🏗️ Architecture
 
-### Hybrid Architecture: Vanilla JS + React Islands
+### ESM-Only Monolithic with React Islands Architecture
 
-**Core Philosophy**: Keep the main application lightweight with vanilla JavaScript, use React only for complex interactive components.
+**Core Philosophy**: Strict ES modules everywhere, React Islands for selective interactivity, Vite for blazing-fast development and optimized production builds, Cloudflare Pages for global edge deployment.
 
 ```
 ┌─────────────────────────────────────────┐
-│          Browser (Client-Side)          │
+│         Browser (Client-Side)           │
 ├─────────────────────────────────────────┤
-│  Vanilla JavaScript (ES6+)              │
-│  ├── App Controller (app.js)            │
-│  ├── Event Handlers                     │
-│  ├── DOM Manipulation                   │
-│  └── State Management (Window objects)  │
+│  8 HTML Entry Points                    │
+│  ├── index.html (Homepage)              │
+│  ├── search.html (Search Page)          │
+│  ├── view-split-lease.html (Details)    │
+│  └── ... (5 more pages)                 │
 ├─────────────────────────────────────────┤
-│  React Islands (Specific Components)    │
-│  ├── Schedule Selector (TypeScript)     │
-│  ├── Informational Text (Tooltips)      │
-│  └── Contact Host Modal (JSX)           │
+│  React Islands (Selective Hydration)    │
+│  ├── SearchPage.jsx (Search logic)      │
+│  ├── DaySelector.jsx (Schedule picker)  │
+│  ├── Header.jsx (Navigation)            │
+│  └── GoogleMap.jsx (Interactive map)    │
+├─────────────────────────────────────────┤
+│  ESM Utility Libraries                  │
+│  ├── supabase.js (DB client)            │
+│  ├── dataLookups.js (Location cache)    │
+│  └── urlParams.js (URL state sync)      │
 ├─────────────────────────────────────────┤
 │  API Layer                              │
-│  ├── Supabase Client (Read Operations)  │
-│  └── Bubble.io API (Write Operations)   │
+│  ├── Supabase Client (PostgreSQL)       │
+│  └── Bubble.io API (Workflows)          │
 └─────────────────────────────────────────┘
          ↓                    ↓
 ┌──────────────────┐  ┌─────────────────┐
@@ -409,62 +466,88 @@ npx playwright test --headed
 │  - Photos        │  │  - AI Research  │
 │  - Locations     │  │  - Auth         │
 └──────────────────┘  └─────────────────┘
+         ↑
+┌─────────────────────────────────────────┐
+│       Cloudflare Pages (Edge)           │
+│  ├── Global CDN                         │
+│  ├── Static HTML/CSS/JS                 │
+│  └── Cloudflare Functions (Dynamic)     │
+│      └── /view-split-lease/[id]         │
+└─────────────────────────────────────────┘
 ```
 
 ### Data Flow Architecture
 
 **Filter Application Flow**:
 ```
-User Changes Filter
+User Changes Filter in SearchPage.jsx
     ↓
-Event Listener Triggered
+React State Update (useState hook)
     ↓
-Collect All Filter Values
+useEffect Triggers Re-fetch
     ↓
-FilterConfig.buildFilterConfig() - Convert to DB format
+Supabase Query with Filters
     ↓
-SupabaseAPI.getListings(filters) - Query database
+Transform Database Results
     ↓
-Transform Database Format to App Format
+React Re-renders Listing Cards
     ↓
-renderListings() - Update DOM
+Update Map Markers (GoogleMap.jsx)
     ↓
-updateMapMarkers() - Sync map
+Update URL Params (urlParams.js)
     ↓
-User Sees Updated Results
+User Sees Updated Results (Instant)
 ```
 
 **Dynamic Pricing Flow**:
 ```
-User Selects Days in Schedule Selector
+User Selects Days in DaySelector.jsx
     ↓
-React Component Callback: onSelectionChange(days)
+React onChange Callback
     ↓
-Update window.selectedDays global variable
+Parent Component State Update (SearchPage.jsx)
     ↓
-window.updateAllDisplayedPrices() - Recalculate all cards
+Price Calculation for Each Listing
     ↓
-For each listing: calculateDynamicPrice(listing, nightCount)
+React Re-renders with New Prices
     ↓
-Update DOM with new prices
+Map Markers Update with New Prices
     ↓
-window.applyFilters() - Re-fetch if filters active
+URL Params Update for Sharing
+    ↓
+User Sees Updated Prices (< 200ms)
+```
+
+**Islands Hydration Flow**:
+```
+Browser Loads Static HTML
+    ↓
+Vite Injects React Island Scripts
+    ↓
+React createRoot() for Each Island
+    ↓
+Island Hydrates with Interactivity
+    ↓
+User Can Interact with Island
+    ↓
+Non-Island Content Remains Static (Fast)
 ```
 
 ### State Management
 
-**Global State** (Window Objects):
-- `window.ENV` - Environment configuration
-- `window.SupabaseAPI` - Database client instance
-- `window.FilterConfig` - Filter configuration manager
-- `window.currentListings` - Currently displayed listings
-- `window.selectedDays` - Schedule selection (array of day indices)
-- `window.mapInstance` - Google Maps instance
+**React Island State** (Component-Local):
+- React components use hooks (`useState`, `useEffect`, `useMemo`)
+- Each island manages its own state independently
+- State lifting for parent-child communication
+- URL params for shareable state (filters, days selected)
 
-**Component-Local State**:
-- React components use hooks (`useState`, `useEffect`)
-- Vanilla JS modals use object properties
-- Lazy loading uses module-scoped counters
+**Shared State Patterns**:
+- URL parameters for filters (via `urlParams.js`)
+- Supabase client singleton (imported from `lib/supabase.js`)
+- Data lookups cached in memory (via `dataLookups.js`)
+- Environment variables via `import.meta.env.VITE_*`
+
+**No Global Window State** - All state is in React or URL params
 
 ---
 
@@ -472,12 +555,14 @@ window.applyFilters() - Re-fetch if filters active
 
 ### Frontend Stack
 
-- **HTML5** - Semantic markup
+- **React 18.2.0** - Islands Architecture for selective interactivity
+- **Vite 5.0.0** - Next-generation build tool with HMR
+- **ES Modules** - Strict ESM-only (type: "module")
+- **Framer Motion 12.23.24** - Production-ready animations
+- **Lucide React 0.553.0** - Icon library (600+ icons)
+- **Lottie React 2.4.1** - JSON-based animations
+- **HTML5** - Semantic markup, 8 entry points
 - **CSS3** - Custom properties, Flexbox, Grid
-- **JavaScript ES6+** - Modern syntax, modules, async/await
-- **React 18** - Component library for complex UI
-- **TypeScript** - Type safety for React components
-- **Styled Components** - CSS-in-JS for React styling
 
 ### Backend & Database
 
@@ -501,10 +586,12 @@ window.applyFilters() - Re-fetch if filters active
 
 ### Build & Development
 
-- **Vite** - Fast build tool for React components
-- **TypeScript Compiler** - Type checking
-- **Playwright** - End-to-end testing
-- **Python HTTP Server** - Local development
+- **Vite 5.0.0** - Dev server + production bundler
+- **@vitejs/plugin-react 4.2.0** - React Fast Refresh
+- **Node.js 18+** - JavaScript runtime
+- **npm** - Package manager
+- **Playwright** (Future) - End-to-end testing
+- **Git** - Version control
 
 ---
 
@@ -512,23 +599,39 @@ window.applyFilters() - Re-fetch if filters active
 
 ### Common Issues
 
-#### No Listings Displayed
+#### Port 5173 Already in Use
 
-**Symptoms**: Filters show results count, but no listings appear.
-
-**Cause**: Critical bug in `supabase-api.js:64` - all listings lack `Approved=true` flag.
+**Symptoms**: `npm run dev` fails with port already in use error.
 
 **Solution**:
-```javascript
-// js/supabase-api.js line 64
-// Remove this line:
-.eq('Approved', true)
+```bash
+# Vite will automatically try 5174, 5175, etc.
+# Or manually kill the process:
+npx kill-port 5173
 
-// Or change to:
-.in('Approved', [true, null, false])  // Show all regardless of approval
+# On Windows:
+netstat -ano | findstr :5173
+taskkill /PID <PID> /F
 ```
 
-**Verification**: Check browser console for empty result arrays.
+#### No Listings Displayed
+
+**Symptoms**: Search page loads but no listings appear.
+
+**Cause**: Supabase connection issue or RLS policies blocking data.
+
+**Solution**:
+1. Check browser console for Supabase errors
+2. Verify `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in `.env`
+3. Test Supabase connection:
+   ```javascript
+   import { supabase } from './src/lib/supabase.js';
+   const { data, error } = await supabase.from('listing').select('*').limit(1);
+   console.log(data, error);
+   ```
+4. Check RLS policies in Supabase dashboard
+
+**Verification**: Check browser console network tab for Supabase API calls.
 
 #### Map Not Loading
 
@@ -538,75 +641,116 @@ window.applyFilters() - Re-fetch if filters active
 1. Invalid Google Maps API key
 2. API not enabled in Google Cloud Console
 3. Domain restriction preventing access
+4. React Island not hydrating
 
 **Solutions**:
-1. Verify `GOOGLE_MAPS_API_KEY` in `config.local.js`
+1. Verify `VITE_GOOGLE_MAPS_API_KEY` in `.env`
 2. Enable both **Maps JavaScript API** and **Places API**
-3. Add your domain to allowed referrers (or remove restrictions for testing)
+3. Add `localhost:5173` to allowed referrers (or remove restrictions for testing)
 4. Check browser console for specific Google Maps errors
+5. Verify GoogleMap.jsx component is rendering (React DevTools)
 
 #### Prices Not Updating
 
 **Symptoms**: Changing schedule selector doesn't update listing prices.
 
 **Causes**:
-1. React component not loaded
-2. Integration script failed to wire callback
+1. React Island not hydrating
+2. State not propagating from DaySelector to SearchPage
 3. Missing price fields in database
 
 **Solutions**:
 1. Check console for React errors during initialization
-2. Verify `dist/schedule-selector.js` exists and loads
-3. Confirm `window.updateAllDisplayedPrices` function exists
-4. Check database for `💰Nightly Host Rate for X nights` fields
+2. Verify DaySelector.jsx component is rendering
+3. Check SearchPage.jsx receives day selection updates
+4. Verify database has `💰Nightly Host Rate for X nights` fields
+5. Use React DevTools to inspect component state
 
 #### Filters Not Working
 
 **Symptoms**: Selecting filters doesn't change results.
 
 **Causes**:
-1. Filter configuration not initialized
-2. Database connection failed
+1. React Island not hydrating
+2. Supabase query building incorrectly
 3. Incorrect filter IDs
+4. Data lookups not initializing
 
 **Solutions**:
-1. Ensure `FilterConfig.initializeFilterConfig()` called after Supabase init
-2. Check browser console for Supabase connection errors
-3. Verify borough/neighborhood IDs match database values
-4. Test with single filter to isolate issue
+1. Check browser console for React errors
+2. Verify SearchPage.jsx is rendering
+3. Inspect Supabase queries in Network tab
+4. Verify borough/neighborhood IDs match database values
+5. Check dataLookups.js initialization
 
 ### Debugging Tips
 
-#### Enable Detailed Logging
+#### Check Vite Dev Server
+
+```bash
+# Terminal output shows:
+# ➜  Local:   http://localhost:5173/
+# ➜  Network: use --host to expose
+
+# Verify server is running and port is correct
+```
+
+#### Check Environment Variables
 
 ```javascript
-// In browser console
-window.DEBUG = true;
+// Browser console
+console.log(import.meta.env.VITE_SUPABASE_URL);
+console.log(import.meta.env.VITE_SUPABASE_ANON_KEY);
+console.log(import.meta.env.VITE_GOOGLE_MAPS_API_KEY);
 
-// Or uncomment in app.js
-const DEBUG = true;
+// All should return values, not undefined
 ```
 
 #### Check Supabase Connection
 
 ```javascript
-// Browser console
-console.log(window.SupabaseAPI);
-console.log(window.ENV.SUPABASE_URL);
-console.log(window.ENV.SUPABASE_ANON_KEY);
+// Browser console (after page load)
+import { supabase } from './src/lib/supabase.js';
 
 // Test query
-await window.SupabaseAPI.getBoroughs();
+const { data, error } = await supabase.from('listing').select('*').limit(1);
+console.log(data, error);
 ```
 
-#### Inspect Filter State
+#### Inspect React Component State
 
-```javascript
-// Browser console
-console.log(window.FilterConfig);
-console.log(window.selectedDays);
-console.log(window.currentListings);
+- Install React DevTools extension
+- Select component in DevTools
+- Inspect state, props, and hooks
+- Check for re-render loops or stale state
+
+#### Build Failures
+
+**Symptoms**: `npm run build` fails with errors.
+
+**Solutions**:
+```bash
+# Clear cache and reinstall
+rm -rf node_modules dist .vite
+npm install
+npm run build
+
+# On Windows:
+rmdir /s /q node_modules dist .vite
+npm install
+npm run build
 ```
+
+#### HMR Not Working
+
+**Symptoms**: Changes don't appear without manual refresh.
+
+**Solutions**:
+1. Check browser console for websocket errors
+2. Ensure no firewall blocking port 5173
+3. Try `npm run dev -- --host` for network access
+4. Clear browser cache
+5. Restart Vite dev server
 
 ### Browser Compatibility
 
@@ -617,9 +761,15 @@ console.log(window.currentListings);
 - Mobile Safari iOS 14+
 - Chrome Mobile Android 90+
 
+**Requirements**:
+- ES Modules support (native)
+- ES2020+ features
+- CSS Custom Properties
+- Intersection Observer API
+
 **Known Issues**:
-- Internet Explorer: Not supported (uses ES6+ features)
-- Old Safari (<14): Intersection Observer may need polyfill
+- Internet Explorer: Not supported (uses ES Modules)
+- Old Safari (<14): May need polyfills for some features
 
 ---
 
@@ -660,18 +810,20 @@ console.log(window.currentListings);
 ### Project Priorities
 
 **Current Focus**:
-1. Fix critical Approved filter bug (see `supabase-api.js:64`)
-2. Verify dynamic borough/neighborhood loading
-3. Add comprehensive test coverage
+1. Complete all 8 page implementations (search, detail, FAQ, policies, etc.)
+2. Implement comprehensive test coverage (Vitest + Playwright)
+3. Optimize React Islands hydration performance
 4. Improve error handling and user feedback
+5. Add loading states for better UX
 
 **Future Roadmap**:
 1. Add listing title/description search
-2. Implement user accounts and saved searches
-3. Add favorites/bookmarking
-4. Build host dashboard
-5. Integrate payment processing
+2. Implement user accounts and saved searches (Supabase Auth)
+3. Add favorites/bookmarking with localStorage or Supabase
+4. Build host dashboard (new page set)
+5. Integrate payment processing (Stripe)
 6. Add review/rating system
+7. Implement real-time availability updates (Supabase Realtime)
 
 ---
 
@@ -697,6 +849,7 @@ MIT License - See [LICENSE](./LICENSE) file for details.
 
 ---
 
-**Last Updated**: 2025
+**Last Updated**: January 2025
 **Version**: 1.0.0
 **Status**: Active Development
+**Architecture**: ESM-only Monolithic + React Islands + Vite + Cloudflare Pages

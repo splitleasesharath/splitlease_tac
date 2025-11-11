@@ -1,27 +1,56 @@
 # Prepare Application
 
-Setup the application for the review or test.
+Setup the Split Lease TAC application for review or testing.
 
 ## Variables
 
-PORT: If `.ports.env` exists, read FRONTEND_PORT from it, otherwise default to 5173
+PORT: Default to 5173 (Vite dev server default)
 
 ## Setup
 
-1. Check if `.ports.env` exists:
-   - If it exists, source it and use `FRONTEND_PORT` for the PORT variable
-   - If not, use default PORT: 5173
+1. Navigate to the app directory:
+   ```bash
+   cd "C:\Users\igor\OneDrive\Documents\TAC - Split Lease\app"
+   ```
 
-2. Reset the database:
-   - Run `scripts/reset_db.sh`
+2. Install dependencies (if not already installed):
+   ```bash
+   npm install
+   ```
 
-3. Start the application:
-   - IMPORTANT: Make sure the server and client are running on a background process using `nohup sh ./scripts/start.sh > /dev/null 2>&1 &`
-   - The start.sh script will automatically use ports from `.ports.env` if it exists
-   - Use `./scripts/stop_apps.sh` to stop the server and client
+3. Verify environment setup:
+   - Check that `package.json` has `"type": "module"`
+   - Verify `vite.config.js` exists
+   - Ensure `src/islands/` directory structure exists
+   - Confirm `.env` or environment variables are configured for Supabase
 
-4. Verify the application is running:
-   - The application should be accessible at http://localhost:PORT (where PORT is from `.ports.env` or default 5173). If port 5173 is not available, kill shells with port 5173 and retry.
-   
-Note: Read `scripts/` and `README.md` for more information on how to start, stop and reset the server and client.
+4. Start the Vite development server:
+   ```bash
+   npm run dev
+   ```
+   - Vite will start on port 5173 (or next available port)
+   - Hot Module Replacement (HMR) is automatically enabled
+   - All 8 HTML entry points are accessible
+
+5. Verify the application is running:
+   - The application should be accessible at http://localhost:5173
+   - Entry points available:
+     - http://localhost:5173/ (homepage)
+     - http://localhost:5173/search.html
+     - http://localhost:5173/view-split-lease.html
+     - http://localhost:5173/faq.html
+     - http://localhost:5173/policies.html
+     - http://localhost:5173/list-with-us.html
+     - http://localhost:5173/success-stories.html
+     - http://localhost:5173/why-split-lease.html
+
+   If port 5173 is not available, Vite will automatically use the next available port (5174, 5175, etc.)
+
+## Notes
+
+- No database reset needed - Supabase is external and managed independently
+- No separate build step required for development - Vite handles compilation on-the-fly
+- To stop the server, use Ctrl+C in the terminal running `npm run dev`
+- For production builds, use `npm run build` which outputs to `dist/`
+- Read `README.md` for detailed architecture information and setup instructions
 

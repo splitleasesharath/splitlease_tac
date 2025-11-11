@@ -7,15 +7,15 @@
 As a user searching for split lease properties, I want to select which days of the week I need accommodation so that I can see accurate per-night pricing based on my specific schedule (2-5 contiguous days required).
 
 ## Prerequisites
-- Application server running on http://localhost:8000
-- React Schedule Selector component built and loaded (`dist/schedule-selector.js`)
+- Application server running on http://localhost:5173
+- React DaySelector Island component hydrated correctly (Vite handles building automatically)
 - At least 3 listings with price data for multiple night counts
 - Listings must have fields: `💰Nightly Host Rate for 2 nights`, `💰Nightly Host Rate for 3 nights`, etc.
 
 ## Test Steps
 
 ### Step 1: Load Page and Locate Schedule Selector
-**Action**: Navigate to http://localhost:8000
+**Action**: Navigate to http://localhost:5173
 **Verify**:
 - Page loads successfully
 - Schedule selector React component is visible at top of filter panel
@@ -156,10 +156,10 @@ Database listings must have price fields populated:
 At least 3 listings should have different price points to verify dynamic calculation.
 
 ## Failure Scenarios
-- **Component doesn't render**: Check `dist/schedule-selector.js` exists and loads
-- **Days select but prices don't update**: Verify `onSelectionChange` callback in `schedule-selector-integration.js`
-- **Non-contiguous days allowed**: Check validation logic in `SearchScheduleSelector.tsx`
-- **Wrong prices displayed**: Verify `calculateDynamicPrice()` in app.js:16
+- **Component doesn't render**: Verify Vite build completed and check browser console for React hydration errors
+- **Days select but prices don't update**: Verify `onChange` callback in `src/islands/pages/SearchPage.jsx`
+- **Non-contiguous days allowed**: Check validation logic in `src/islands/shared/DaySelector.jsx`
+- **Wrong prices displayed**: Verify price calculation logic in `src/islands/pages/SearchPage.jsx`
 
 ## Performance Expectations
 - Day selection should be instant (< 100ms)

@@ -7,7 +7,7 @@
 As a user searching for split lease properties, I want to apply multiple filters (borough, neighborhood, price tier, week pattern) so that I can narrow down results to properties that match my specific requirements.
 
 ## Prerequisites
-- Application server running on http://localhost:8000
+- Application server running on http://localhost:5173
 - Supabase database connection configured
 - At least 10 listings available across different boroughs and neighborhoods
 - FilterConfig initialized with database data
@@ -15,7 +15,7 @@ As a user searching for split lease properties, I want to apply multiple filters
 ## Test Steps
 
 ### Step 1: Load Page and Wait for Initialization
-**Action**: Navigate to http://localhost:8000
+**Action**: Navigate to http://localhost:5173
 **Verify**:
 - Page loads successfully
 - Listings appear (baseline state)

@@ -7,15 +7,15 @@
 As a user searching for a split lease property, I want to view available listings on the search page so that I can browse properties that match my needs.
 
 ## Prerequisites
-- Application server running on http://localhost:8000
+- Application server running on http://localhost:5173
 - Supabase database connection configured with valid API keys
 - At least 1 listing available in the database
-- React components built (`npm run build:components`)
+- React Islands hydrating correctly (no need to build separately - Vite handles this)
 
 ## Test Steps
 
 ### Step 1: Navigate to Search Page
-**Action**: Open browser and navigate to http://localhost:8000
+**Action**: Open browser and navigate to http://localhost:5173
 **Verify**:
 - Page loads without errors
 - No console errors appear
@@ -99,7 +99,7 @@ All verification steps pass without errors, screenshots show properly rendered U
 - **No listings appear**: Check Supabase connection and `Approved` filter in `supabase-api.js:64`
 - **Map doesn't load**: Verify Google Maps API key in `config.local.js`
 - **Filters show "Loading..."**: Check FilterConfig initialization in app.js
-- **React components missing**: Verify `dist/schedule-selector.js` exists
+- **React Islands not hydrating**: Check browser console for React errors, verify `npm run build` completed successfully
 
 ## Notes
 This is the most basic test that validates the core functionality of the search page. All other features depend on this working correctly.

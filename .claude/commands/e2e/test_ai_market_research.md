@@ -7,7 +7,7 @@
 As a user researching split lease options, I want to request a custom AI-generated market report by describing my needs in freeform text so that I can get personalized insights delivered to my email.
 
 ## Prerequisites
-- Application server running on http://localhost:8000
+- Application server running on http://localhost:5173
 - Bubble.io API configured for AI research workflow
 - Lottie animation library loaded
 - AI Signup modal component loaded (`js/ai-signup.js`)
@@ -16,7 +16,7 @@ As a user researching split lease options, I want to request a custom AI-generat
 ## Test Steps
 
 ### Step 1: Load Page and Locate Entry Points
-**Action**: Navigate to http://localhost:8000
+**Action**: Navigate to http://localhost:5173
 **Verify**:
 - Purple floating button with atom animation visible on map section (bottom-right)
 - Chat widget visible in bottom-right corner with "Get Market Research" label

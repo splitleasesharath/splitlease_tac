@@ -7,7 +7,7 @@
 As a user interested in a specific property, I want to send a message to the host through a contact form so that I can inquire about availability, ask questions, or express interest in booking.
 
 ## Prerequisites
-- Application server running on http://localhost:8000
+- Application server running on http://localhost:5173
 - At least 1 listing card visible on the page
 - Bubble.io API configured with valid endpoint and API key
 - Contact Host React component loaded (`components/ContactHost/contact-host-messaging.js`)
@@ -15,7 +15,7 @@ As a user interested in a specific property, I want to send a message to the hos
 ## Test Steps
 
 ### Step 1: Load Page and Locate Listing
-**Action**: Navigate to http://localhost:8000 and wait for listings to load
+**Action**: Navigate to http://localhost:5173 and wait for listings to load
 **Verify**:
 - At least 1 listing card is visible
 - Each listing has a "Contact Host" button

@@ -31,7 +31,7 @@ Focus on the following files:
 - `README.md` - Contains the project overview and instructions.
 - `app/search-page-2/index.html` - Main single-page entry point (HTML).
 - `app/search-page-2/js/**` - Core JavaScript modules (app.js, supabase-api.js, filter-config.js, etc.).
-- `app/search-page-2/components/**` - React island components (ScheduleSelector, ContactHost, AiSignup).
+- `app/src/islands/**` - React island components (SearchPage, DaySelector, GoogleMap, Header, Footer).
 - `app/search-page-2/css/**` - Stylesheets (styles.css, responsive.css, ai-signup.css).
 - `app/search-page-2/dist/**` - Built React component bundles.
 - `adws/**` - Contains the AI Developer Workflow (ADW) scripts.

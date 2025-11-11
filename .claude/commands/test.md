@@ -1,15 +1,15 @@
 # Application Validation Test Suite
 
-Execute comprehensive validation tests for the Split Lease Search Page application, returning results in a standardized JSON format for automated processing.
+Execute comprehensive validation tests for the Split Lease TAC application, returning results in a standardized JSON format for automated processing.
 
 ## Purpose
 
-Proactively identify and fix issues in the Split Lease Search Page application before they impact users or developers. By running this comprehensive test suite, you can:
-- Detect TypeScript type errors in React components
-- Identify broken builds or invalid component bundles
-- Verify React component builds succeed
-- Ensure JavaScript modules load without errors
-- Validate configuration files are properly formatted
+Proactively identify and fix issues in the Split Lease TAC application before they impact users or developers. By running this comprehensive test suite, you can:
+- Verify dependencies are properly installed
+- Ensure Vite build completes successfully
+- Validate environment configuration
+- Check React Island components compile correctly
+- Verify production build succeeds
 - Ensure the application is in a healthy state
 
 ## Variables
@@ -37,49 +37,49 @@ TEST_COMMAND_TIMEOUT: 5 minutes
 
 ## Test Execution Sequence
 
-### Split Lease Search Page Tests
+### Split Lease TAC Application Tests
 
 1. **Dependencies Installation**
-   - Preparation Command: None
+   - Preparation Command: `cd app`
    - Command: `npm install`
    - test_name: "dependencies_install"
-   - test_purpose: "Ensures all npm dependencies are installed correctly, including React, TypeScript, Vite, Playwright, styled-components, and framer-motion"
+   - test_purpose: "Ensures all npm dependencies are installed correctly, including React 18.2.0, Vite 5.0.0, @supabase/supabase-js, framer-motion, lucide-react, and lottie-react"
 
-2. **TypeScript Type Check**
-   - Preparation Command: None
-   - Command: `npx tsc --noEmit`
-   - test_name: "typescript_check"
-   - test_purpose: "Validates TypeScript type correctness for React components (ScheduleSelector, ContactHost, AiSignup) without generating output files, catching type errors, missing imports, and incorrect function signatures"
+2. **Environment Configuration Check**
+   - Preparation Command: `cd app`
+   - Command: `test -f .env || test -f .env.example`
+   - test_name: "environment_check"
+   - test_purpose: "Verifies that environment configuration exists (.env or .env.example file) for Supabase and other API keys"
 
-3. **React Component Build**
-   - Preparation Command: None
-   - Command: `npm run build:components`
-   - test_name: "react_component_build"
-   - test_purpose: "Builds React components using Vite, compiling ScheduleSelector TypeScript component to dist/schedule-selector.js, ensuring successful bundle generation"
+3. **Vite Configuration Validation**
+   - Preparation Command: `cd app`
+   - Command: `test -f vite.config.js && node -c vite.config.js`
+   - test_name: "vite_config_validation"
+   - test_purpose: "Verifies that vite.config.js exists and is syntactically correct JavaScript"
 
-4. **Built Component Validation**
-   - Preparation Command: None
-   - Command: `test -f dist/schedule-selector.js && echo "Schedule selector bundle exists"`
-   - test_name: "built_component_validation"
-   - test_purpose: "Verifies that the compiled schedule-selector.js bundle exists in the dist/ directory after build"
+4. **Package.json ESM Check**
+   - Preparation Command: `cd app`
+   - Command: `grep -q '"type": "module"' package.json && echo "ESM configured"`
+   - test_name: "esm_check"
+   - test_purpose: "Ensures package.json has type: module for ESM-only architecture"
 
-5. **JavaScript Syntax Check**
-   - Preparation Command: None
-   - Command: `node -c js/app.js && node -c js/supabase-api.js && node -c js/filter-config.js`
-   - test_name: "javascript_syntax_check"
-   - test_purpose: "Validates JavaScript syntax for core application files (app.js, supabase-api.js, filter-config.js) to catch syntax errors before runtime"
+5. **React Islands Structure Check**
+   - Preparation Command: `cd app`
+   - Command: `test -d src/islands && test -d src/lib && echo "Directory structure valid"`
+   - test_name: "structure_check"
+   - test_purpose: "Verifies that required directory structure exists (src/islands/, src/lib/)"
 
-6. **Configuration File Validation**
-   - Preparation Command: None
-   - Command: `node -c js/config.js`
-   - test_name: "config_validation"
-   - test_purpose: "Verifies that configuration files are syntactically correct and can be loaded without errors"
+6. **Vite Build**
+   - Preparation Command: `cd app`
+   - Command: `npm run build`
+   - test_name: "vite_build"
+   - test_purpose: "Builds the application using Vite, compiling all React Islands and assets to dist/ directory, ensuring successful production bundle generation"
 
-7. **HTML Validation**
-   - Preparation Command: None
-   - Command: `grep -q 'schedule-selector-root' index.html && echo "HTML structure valid"`
-   - test_name: "html_structure_validation"
-   - test_purpose: "Checks that index.html contains required mount points for React components (schedule-selector-root, info-text-root)"
+7. **Built Output Validation**
+   - Preparation Command: `cd app`
+   - Command: `test -d dist && test -f dist/index.html && echo "Build output valid"`
+   - test_name: "build_output_validation"
+   - test_purpose: "Verifies that the build output directory exists and contains expected HTML entry points"
 
 ## Report
 
