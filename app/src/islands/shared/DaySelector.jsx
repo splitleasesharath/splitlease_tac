@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { DAY_ABBREVIATIONS, DAY_NAMES } from '../../lib/constants.js';
+import { DAY_ABBREVIATIONS, DAY_NAMES, DEFAULTS } from '../../lib/constants.js';
 
 /**
  * DaySelector - Interactive day of week selector component with gradient design
@@ -22,12 +22,14 @@ import { DAY_ABBREVIATIONS, DAY_NAMES } from '../../lib/constants.js';
  * - Check-in/Check-out display
  * - Clear selection button
  * - Visual indication of selected/unselected state
+ * - Defaults to Monday-Friday (indices 1-5) when no selection provided
  *
  * Day numbering (matching constants.js):
  * - Sunday = 0, Monday = 1, Tuesday = 2, Wednesday = 3, Thursday = 4, Friday = 5, Saturday = 6
  *
  * @param {Object} props
- * @param {number[]} props.selected - Array of selected day numbers (0-6, where 0=Sunday)
+ * @param {number[]} [props.selected] - Array of selected day numbers (0-6, where 0=Sunday).
+ *                                      If undefined or empty, defaults to Monday-Friday [1,2,3,4,5]
  * @param {Function} props.onChange - Callback function: (selectedDays: number[]) => void
  * @param {Function} [props.onError] - Callback when validation error occurs: (errorMessage: string) => void
  * @param {string} [props.label] - Optional label text to display above selector
@@ -38,7 +40,7 @@ import { DAY_ABBREVIATIONS, DAY_NAMES } from '../../lib/constants.js';
  */
 export default function DaySelector(props) {
   const {
-    selected = [],
+    selected,
     onChange,
     onError,
     label,
@@ -46,6 +48,12 @@ export default function DaySelector(props) {
     minDays = 3,
     requireContiguous = true
   } = props;
+
+  // Apply Monday-Friday default when no selection provided
+  // This is intentionally done here to ensure component-level default
+  const effectiveSelected = (selected === undefined || (Array.isArray(selected) && selected.length === 0))
+    ? DEFAULTS.DEFAULT_SELECTED_DAYS
+    : selected;
 
   // State management
   const [isDragging, setIsDragging] = useState(false);
@@ -202,12 +210,12 @@ export default function DaySelector(props) {
     // Check if this was a click (same cell) or drag (different cell)
     if (!isDragging && dayIndex === mouseDownIndex) {
       // CLICK - Toggle the day
-      const isSelected = selected.includes(dayIndex);
+      const isSelected = effectiveSelected.includes(dayIndex);
       let newSelection;
 
       if (isSelected) {
         // Check if removing this day would go below minimum nights
-        const daysAfterRemoval = selected.length - 1;
+        const daysAfterRemoval = effectiveSelected.length - 1;
         const nightsAfterRemoval = daysAfterRemoval - 1;
         if (nightsAfterRemoval < minDays) {
           displayError(`Cannot remove day - you must select at least ${minDays} night${minDays > 1 ? 's' : ''} per week`);
@@ -216,9 +224,9 @@ export default function DaySelector(props) {
           setMouseDownIndex(null);
           return;
         }
-        newSelection = selected.filter(day => day !== dayIndex);
+        newSelection = effectiveSelected.filter(day => day !== dayIndex);
       } else {
-        newSelection = [...selected, dayIndex].sort((a, b) => a - b);
+        newSelection = [...effectiveSelected, dayIndex].sort((a, b) => a - b);
       }
 
       if (onChange) {
@@ -239,7 +247,7 @@ export default function DaySelector(props) {
       }, 3000);
     } else if (isDragging) {
       // DRAG - Validate immediately
-      const validation = validateSelection(selected);
+      const validation = validateSelection(effectiveSelected);
       if (!validation.valid && validation.error) {
         displayError(validation.error);
         if (onChange) {
@@ -251,7 +259,7 @@ export default function DaySelector(props) {
     // Reset drag state
     setIsDragging(false);
     setMouseDownIndex(null);
-  }, [isDragging, mouseDownIndex, selected, validateSelection, displayError, onChange, minDays]);
+  }, [isDragging, mouseDownIndex, effectiveSelected, validateSelection, displayError, onChange, minDays]);
 
   /**
    * Handle clear/reset - clear all selections
@@ -346,11 +354,11 @@ export default function DaySelector(props) {
    * Update check-in/check-out and check for contiguity errors
    */
   useEffect(() => {
-    calculateCheckinCheckout(selected);
+    calculateCheckinCheckout(effectiveSelected);
 
     // Check for contiguity error (visual feedback + immediate alert)
-    if (selected.length > 1 && requireContiguous) {
-      const isValid = isContiguous(selected);
+    if (effectiveSelected.length > 1 && requireContiguous) {
+      const isValid = isContiguous(effectiveSelected);
       const wasContiguousError = hasContiguityError;
       setHasContiguityError(!isValid);
 
@@ -365,7 +373,7 @@ export default function DaySelector(props) {
         setShowError(false);
       }
     }
-  }, [selected, requireContiguous, isContiguous, hasContiguityError, showError, displayError, calculateCheckinCheckout]);
+  }, [effectiveSelected, requireContiguous, isContiguous, hasContiguityError, showError, displayError, calculateCheckinCheckout]);
 
   // Cleanup timeouts on unmount
   useEffect(() => {
@@ -394,7 +402,7 @@ export default function DaySelector(props) {
           {/* Days Grid */}
           <div className="days-grid">
             {DAY_ABBREVIATIONS.map((dayAbbr, index) => {
-              const isActive = selected.includes(index);
+              const isActive = effectiveSelected.includes(index);
 
               return (
                 <button
@@ -419,7 +427,7 @@ export default function DaySelector(props) {
         </div>
 
         {/* Check-in/Check-out Display - Advanced with wrap-around support */}
-        {selected.length > 0 && checkIn && checkOut && (
+        {effectiveSelected.length > 0 && checkIn && checkOut && (
           <div className="info-container">
             <div className="info-text">
               Check-in: <strong>{checkIn}</strong> • Check-out: <strong>{checkOut}</strong>
