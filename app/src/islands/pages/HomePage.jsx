@@ -257,7 +257,7 @@ function ScheduleSection() {
       lottieUrl:
         'https://50bf0464e4735aabad1cc8848a0e8b8a.cdn.bubble.io/f1736800679546x885675666145660000/Days-of-the-week-lottie.json',
       buttonText: 'Explore weeknight listings',
-      days: '2,3,4,5,6', // Monday-Friday (1-based)
+      days: '1,2,3,4,5', // Monday-Friday (0-based)
     },
     {
       type: 'weekend',
@@ -265,7 +265,7 @@ function ScheduleSection() {
       lottieUrl:
         'https://50bf0464e4735aabad1cc8848a0e8b8a.cdn.bubble.io/f1736800745354x526611430283845360/weekend-lottie%20%281%29.json',
       buttonText: 'Explore weekend listings',
-      days: '6,7,1,2', // Fri-Sun+Mon (1-based)
+      days: '5,6,0,1', // Friday-Monday (0-based)
     },
     {
       type: 'monthly',
@@ -273,7 +273,7 @@ function ScheduleSection() {
       lottieUrl:
         'https://50bf0464e4735aabad1cc8848a0e8b8a.cdn.bubble.io/f1736800780466x583314971697148400/Weeks-of-the-month-lottie.json',
       buttonText: 'Explore monthly listings',
-      days: '1,2,3,4,5,6,7', // All days (1-based)
+      days: '0,1,2,3,4,5,6', // All days (0-based)
     },
   ];
 
@@ -408,13 +408,13 @@ function ListingsPreview({ selectedDays }) {
   ];
 
   const handleListingClick = (propertyId) => {
-    const daysParam = selectedDays.length > 0 ? selectedDays.map(d => d + 1).join(',') : '2,3,4,5,6';
+    const daysParam = selectedDays.length > 0 ? selectedDays.join(',') : '1,2,3,4,5';
     const propertyUrl = `/view-split-lease.html/${propertyId}?days-selected=${daysParam}&weekly-frequency=Every%20week`;
     window.location.href = propertyUrl;
   };
 
   const handleShowMore = () => {
-    const daysParam = selectedDays.length > 0 ? selectedDays.map(d => d + 1).join(',') : '1,2,3,4,5,6';
+    const daysParam = selectedDays.length > 0 ? selectedDays.join(',') : '1,2,3,4,5';
     const searchUrl = `/search.html?days-selected=${daysParam}`;
     window.location.href = searchUrl;
   };
@@ -651,9 +651,8 @@ export default function HomePage() {
       return;
     }
 
-    // Convert to 1-based indexing for Bubble
-    const bubbleDays = toBubbleDays(selectedDays);
-    const searchUrl = `/search.html?days-selected=${bubbleDays.join(',')}`;
+    // Use 0-based indexing for URL parameters (SearchPage expects 0-based)
+    const searchUrl = `/search.html?days-selected=${selectedDays.join(',')}`;
     window.location.href = searchUrl;
   };
 
