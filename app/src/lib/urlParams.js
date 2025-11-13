@@ -39,22 +39,59 @@ export function parseUrlToFilters() {
 
 /**
  * Parse days parameter from URL
- * Format: "1,2,3,4,5" (comma-separated day indices)
+ * Format: "1,2,3,4,5" (comma-separated day indices using 0-based indexing)
+ * 0=Sunday, 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday, 6=Saturday
+ *
  * @param {string|null} daysParam - The days parameter from URL
  * @returns {Array<number>} Array of day indices (0-6)
+ *
+ * Examples:
+ *   - "1,2,3,4,5" → [1, 2, 3, 4, 5] (Monday-Friday)
+ *   - "0,6" → [0, 6] (Sunday and Saturday)
+ *   - "5,6,0,1" → [5, 6, 0, 1] (Friday-Monday wrap-around)
+ *   - "" or null → [1, 2, 3, 4, 5] (default to Monday-Friday)
+ *   - "invalid" → [1, 2, 3, 4, 5] (fallback to default with warning)
  */
 function parseDaysParam(daysParam) {
-  if (!daysParam) {
+  if (!daysParam || daysParam.trim() === '') {
     return DEFAULTS.DEFAULT_SELECTED_DAYS;
   }
 
   try {
-    const days = daysParam
-      .split(',')
-      .map(d => parseInt(d.trim(), 10))
-      .filter(d => !isNaN(d) && d >= 0 && d <= 6);
+    const originalValues = daysParam.split(',').map(d => d.trim());
+    const invalidValues = [];
 
-    return days.length > 0 ? days : DEFAULTS.DEFAULT_SELECTED_DAYS;
+    const days = originalValues
+      .map(d => {
+        const parsed = parseInt(d, 10);
+        if (isNaN(parsed) || parsed < 0 || parsed > 6) {
+          invalidValues.push(d);
+          return null;
+        }
+        return parsed;
+      })
+      .filter(d => d !== null);
+
+    // Warn about invalid values in development
+    if (invalidValues.length > 0 && import.meta.env.DEV) {
+      console.warn(
+        `Invalid day indices in URL parameter 'days-selected': ${invalidValues.join(', ')}. ` +
+        `Valid values are 0-6 (0=Sunday, 6=Saturday). Invalid values were ignored.`
+      );
+    }
+
+    // If no valid days found, fall back to default
+    if (days.length === 0) {
+      if (import.meta.env.DEV) {
+        console.warn(
+          `No valid days found in URL parameter 'days-selected=${daysParam}'. ` +
+          `Using default: Monday-Friday (1,2,3,4,5).`
+        );
+      }
+      return DEFAULTS.DEFAULT_SELECTED_DAYS;
+    }
+
+    return days;
   } catch (error) {
     console.error('Failed to parse days parameter:', error);
     return DEFAULTS.DEFAULT_SELECTED_DAYS;
@@ -93,13 +130,10 @@ function parseNeighborhoodsParam(neighborhoodsParam) {
 export function serializeFiltersToUrl(filters) {
   const params = new URLSearchParams();
 
-  // Add days-selected parameter (only if not default)
+  // Add days-selected parameter (always include, even if default)
+  // This allows sharing URLs with complete filter state
   if (filters.selectedDays && filters.selectedDays.length > 0) {
-    const daysString = filters.selectedDays.join(',');
-    const defaultDaysString = DEFAULTS.DEFAULT_SELECTED_DAYS.join(',');
-    if (daysString !== defaultDaysString) {
-      params.set('days-selected', daysString);
-    }
+    params.set('days-selected', filters.selectedDays.join(','));
   }
 
   // Add borough parameter (only if not default)
