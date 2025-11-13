@@ -598,28 +598,45 @@ export default function HomePage() {
     updateURL();
   }, [selectedDays]);
 
+  /**
+   * Load day selection state from URL parameter
+   * Reads the 'days-selected' URL parameter and parses it as 0-based day indices
+   * Format: ?days-selected=1,2,3,4,5 (comma-separated, 0-based: 0=Sunday, 6=Saturday)
+   * Invalid or missing parameters are ignored (default selection is maintained)
+   */
   const loadStateFromURL = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const daysParam = urlParams.get('days-selected');
 
     if (daysParam) {
       const decoded = decodeURIComponent(daysParam);
-      // Convert from 1-based (Bubble) to 0-based (JavaScript)
-      const bubbleDays = decoded.split(',').map((d) => parseInt(d.trim()));
-      const jsDays = fromBubbleDays(bubbleDays);
-      setSelectedDays(jsDays);
+      // URL uses 0-based indexing (consistent with SearchPage)
+      // Parse comma-separated day indices and validate
+      const parsedDays = decoded.split(',')
+        .map((d) => parseInt(d.trim(), 10))
+        .filter(d => !isNaN(d) && d >= 0 && d <= 6);
+
+      if (parsedDays.length > 0) {
+        setSelectedDays(parsedDays);
+      }
     }
   };
 
+  /**
+   * Update browser URL with current day selection
+   * Uses 0-based indexing for consistency with SearchPage URL parameter system
+   * Format: ?days-selected=1,2,3,4,5 (comma-separated, 0=Sunday, 6=Saturday)
+   * Uses replaceState to avoid creating excessive browser history entries
+   */
   const updateURL = () => {
     const currentUrl = new URL(window.location);
 
     if (selectedDays.length === 0) {
       currentUrl.searchParams.delete('days-selected');
     } else {
-      // Convert to 1-based indexing for Bubble
-      const bubbleDays = toBubbleDays(selectedDays);
-      currentUrl.searchParams.set('days-selected', bubbleDays.join(', '));
+      // Use 0-based indexing for URL (consistent with SearchPage)
+      // selectedDays is already 0-based (0=Sunday, 1=Monday, etc.)
+      currentUrl.searchParams.set('days-selected', selectedDays.join(','));
     }
 
     window.history.replaceState({}, '', currentUrl);
@@ -639,6 +656,16 @@ export default function HomePage() {
     }
   };
 
+  /**
+   * Navigate to search page with current day selection
+   * Validates that days are selected and continuous, then navigates to search.html
+   * with the days-selected URL parameter in 0-based indexing format
+   *
+   * IMPORTANT: Uses 0-based indexing for URL parameter (NOT Bubble API format)
+   * - 0-based format: 0=Sunday, 1=Monday, ..., 6=Saturday
+   * - This matches SearchPage's URL parameter system (see urlParams.js)
+   * - Bubble API conversion happens later when communicating with the backend
+   */
   const handleExploreRentals = () => {
     if (selectedDays.length === 0) {
       console.log('Please select at least one day');
@@ -651,9 +678,10 @@ export default function HomePage() {
       return;
     }
 
-    // Convert to 1-based indexing for Bubble
-    const bubbleDays = toBubbleDays(selectedDays);
-    const searchUrl = `/search.html?days-selected=${bubbleDays.join(',')}`;
+    // Use 0-based indexing for URL (consistent with SearchPage URL parameter system)
+    // NOTE: selectedDays is already in 0-based format (0=Sunday, 1=Monday, etc.)
+    // Do NOT convert to Bubble format for URL - only convert when calling Bubble API
+    const searchUrl = `/search.html?days-selected=${selectedDays.join(',')}`;
     window.location.href = searchUrl;
   };
 

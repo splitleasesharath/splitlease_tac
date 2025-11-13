@@ -100,3 +100,13 @@ When implementing solutions, prioritize authenticity and appropriate scale over 
     - When troubleshooting Header component styling, dropdowns, or mobile menu
     - When implementing accessibility features (WCAG 2.1 AA compliance)
     - When working with data attribute parsing for island mounting
+
+- app_docs/feature-0449ff2b-schedule-selector-url-sync.md
+  - Conditions:
+    - When working with the DaySelector (schedule selector) component
+    - When implementing URL parameter synchronization for filters
+    - When troubleshooting day selection state persistence
+    - When implementing navigation from HomePage to SearchPage with filters
+    - When working with 0-based day indexing conventions
+    - When debugging URL parameter parsing or serialization
+    - When implementing default selection behavior for day/schedule pickers
