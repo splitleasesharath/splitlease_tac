@@ -14,7 +14,6 @@ import {
   REFERRAL_API_ENDPOINT,
   EMBED_AI_DRAWER_URL
 } from '../../lib/constants.js';
-import { toBubbleDays, fromBubbleDays } from '../../lib/dayUtils.js';
 
 // ============================================================================
 // INTERNAL COMPONENT: Hero Section
@@ -604,10 +603,13 @@ export default function HomePage() {
 
     if (daysParam) {
       const decoded = decodeURIComponent(daysParam);
-      // Convert from 1-based (Bubble) to 0-based (JavaScript)
-      const bubbleDays = decoded.split(',').map((d) => parseInt(d.trim()));
-      const jsDays = fromBubbleDays(bubbleDays);
-      setSelectedDays(jsDays);
+      // Parse 0-based indexing (consistent with SearchPage and DaySelector)
+      const days = decoded.split(',')
+        .map((d) => parseInt(d.trim(), 10))
+        .filter(d => !isNaN(d) && d >= 0 && d <= 6);
+      if (days.length > 0) {
+        setSelectedDays(days);
+      }
     }
   };
 
@@ -617,9 +619,8 @@ export default function HomePage() {
     if (selectedDays.length === 0) {
       currentUrl.searchParams.delete('days-selected');
     } else {
-      // Convert to 1-based indexing for Bubble
-      const bubbleDays = toBubbleDays(selectedDays);
-      currentUrl.searchParams.set('days-selected', bubbleDays.join(', '));
+      // Use 0-based indexing (consistent with SearchPage and DaySelector)
+      currentUrl.searchParams.set('days-selected', selectedDays.join(','));
     }
 
     window.history.replaceState({}, '', currentUrl);
@@ -651,9 +652,8 @@ export default function HomePage() {
       return;
     }
 
-    // Convert to 1-based indexing for Bubble
-    const bubbleDays = toBubbleDays(selectedDays);
-    const searchUrl = `/search.html?days-selected=${bubbleDays.join(',')}`;
+    // Use 0-based indexing (consistent with SearchPage and DaySelector)
+    const searchUrl = `/search.html?days-selected=${selectedDays.join(',')}`;
     window.location.href = searchUrl;
   };
 
