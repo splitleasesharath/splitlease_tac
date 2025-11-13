@@ -1,8 +1,16 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { DAY_ABBREVIATIONS, DAY_NAMES } from '../../lib/constants.js';
+import { DAY_ABBREVIATIONS, DAY_NAMES, DEFAULTS } from '../../lib/constants.js';
+import { parseUrlToFilters, updateUrlParams } from '../../lib/urlParams.js';
 
 /**
  * DaySelector - Interactive day of week selector component with gradient design
+ *
+ * SELF-MANAGING COMPONENT WITH URL SYNCHRONIZATION:
+ * - Manages its own internal state (no longer relies on `selected` prop)
+ * - Reads from URL parameter `days-selected` on mount (0-based indexing)
+ * - Writes to URL parameter when selection changes
+ * - Defaults to Monday-Friday [1,2,3,4,5] when no URL parameter exists
+ * - Notifies parent via `onChange` callback for additional processing
  *
  * PORTED FROM ORIGINAL: input/search/components/ScheduleSelector/SearchScheduleSelector.tsx
  * Now includes ALL advanced features from the original implementation:
@@ -27,7 +35,6 @@ import { DAY_ABBREVIATIONS, DAY_NAMES } from '../../lib/constants.js';
  * - Sunday = 0, Monday = 1, Tuesday = 2, Wednesday = 3, Thursday = 4, Friday = 5, Saturday = 6
  *
  * @param {Object} props
- * @param {number[]} props.selected - Array of selected day numbers (0-6, where 0=Sunday)
  * @param {Function} props.onChange - Callback function: (selectedDays: number[]) => void
  * @param {Function} [props.onError] - Callback when validation error occurs: (errorMessage: string) => void
  * @param {string} [props.label] - Optional label text to display above selector
@@ -38,7 +45,6 @@ import { DAY_ABBREVIATIONS, DAY_NAMES } from '../../lib/constants.js';
  */
 export default function DaySelector(props) {
   const {
-    selected = [],
     onChange,
     onError,
     label,
@@ -47,7 +53,14 @@ export default function DaySelector(props) {
     requireContiguous = true
   } = props;
 
-  // State management
+  // Internal state management (self-managing component)
+  // Initialize from URL parameter or use Monday-Friday default
+  const [selectedDays, setSelectedDays] = useState(() => {
+    // Read from URL on initial mount
+    const urlFilters = parseUrlToFilters();
+    return urlFilters.selectedDays || DEFAULTS.DEFAULT_SELECTED_DAYS;
+  });
+
   const [isDragging, setIsDragging] = useState(false);
   const [mouseDownIndex, setMouseDownIndex] = useState(null);
   const [showError, setShowError] = useState(false);
@@ -59,6 +72,31 @@ export default function DaySelector(props) {
   // Timeout refs for cleanup
   const validationTimeoutRef = useRef(null);
   const errorTimeoutRef = useRef(null);
+
+  // Flag to prevent URL update on initial mount
+  const isInitialMount = useRef(true);
+
+  /**
+   * Sync internal state to URL parameter when selection changes
+   * Notifies parent via onChange callback after URL is updated
+   */
+  useEffect(() => {
+    // Skip URL update on initial mount (URL already parsed)
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    // Update URL with current selection
+    const filters = parseUrlToFilters();
+    filters.selectedDays = selectedDays;
+    updateUrlParams(filters, false); // false = push new history entry
+
+    // Notify parent of change
+    if (onChange) {
+      onChange(selectedDays);
+    }
+  }, [selectedDays, onChange]);
 
   /**
    * Check if selected days are contiguous (handles wrap-around)
@@ -187,11 +225,10 @@ export default function DaySelector(props) {
         newSelection.push(currentDay);
       }
 
-      if (onChange) {
-        onChange(newSelection.sort((a, b) => a - b));
-      }
+      // Update internal state (will trigger URL sync via useEffect)
+      setSelectedDays(newSelection.sort((a, b) => a - b));
     }
-  }, [mouseDownIndex, onChange]);
+  }, [mouseDownIndex]);
 
   /**
    * Handle mouse up - Determine if click or drag, then act accordingly
@@ -202,12 +239,12 @@ export default function DaySelector(props) {
     // Check if this was a click (same cell) or drag (different cell)
     if (!isDragging && dayIndex === mouseDownIndex) {
       // CLICK - Toggle the day
-      const isSelected = selected.includes(dayIndex);
+      const isSelected = selectedDays.includes(dayIndex);
       let newSelection;
 
       if (isSelected) {
         // Check if removing this day would go below minimum nights
-        const daysAfterRemoval = selected.length - 1;
+        const daysAfterRemoval = selectedDays.length - 1;
         const nightsAfterRemoval = daysAfterRemoval - 1;
         if (nightsAfterRemoval < minDays) {
           displayError(`Cannot remove day - you must select at least ${minDays} night${minDays > 1 ? 's' : ''} per week`);
@@ -216,14 +253,13 @@ export default function DaySelector(props) {
           setMouseDownIndex(null);
           return;
         }
-        newSelection = selected.filter(day => day !== dayIndex);
+        newSelection = selectedDays.filter(day => day !== dayIndex);
       } else {
-        newSelection = [...selected, dayIndex].sort((a, b) => a - b);
+        newSelection = [...selectedDays, dayIndex].sort((a, b) => a - b);
       }
 
-      if (onChange) {
-        onChange(newSelection);
-      }
+      // Update internal state (will trigger URL sync via useEffect)
+      setSelectedDays(newSelection);
 
       // Clear existing validation timeout
       if (validationTimeoutRef.current) {
@@ -239,27 +275,23 @@ export default function DaySelector(props) {
       }, 3000);
     } else if (isDragging) {
       // DRAG - Validate immediately
-      const validation = validateSelection(selected);
+      const validation = validateSelection(selectedDays);
       if (!validation.valid && validation.error) {
         displayError(validation.error);
-        if (onChange) {
-          onChange([]);
-        }
+        setSelectedDays([]);
       }
     }
 
     // Reset drag state
     setIsDragging(false);
     setMouseDownIndex(null);
-  }, [isDragging, mouseDownIndex, selected, validateSelection, displayError, onChange, minDays]);
+  }, [isDragging, mouseDownIndex, selectedDays, validateSelection, displayError, minDays]);
 
   /**
    * Handle clear/reset - clear all selections
    */
   const handleClearSelection = useCallback(() => {
-    if (onChange) {
-      onChange([]);
-    }
+    setSelectedDays([]);
     if (validationTimeoutRef.current) {
       clearTimeout(validationTimeoutRef.current);
     }
@@ -267,7 +299,7 @@ export default function DaySelector(props) {
       clearTimeout(errorTimeoutRef.current);
     }
     setShowError(false);
-  }, [onChange]);
+  }, []);
 
   /**
    * Calculate check-in and check-out days based on selection
@@ -346,11 +378,11 @@ export default function DaySelector(props) {
    * Update check-in/check-out and check for contiguity errors
    */
   useEffect(() => {
-    calculateCheckinCheckout(selected);
+    calculateCheckinCheckout(selectedDays);
 
     // Check for contiguity error (visual feedback + immediate alert)
-    if (selected.length > 1 && requireContiguous) {
-      const isValid = isContiguous(selected);
+    if (selectedDays.length > 1 && requireContiguous) {
+      const isValid = isContiguous(selectedDays);
       const wasContiguousError = hasContiguityError;
       setHasContiguityError(!isValid);
 
@@ -365,7 +397,7 @@ export default function DaySelector(props) {
         setShowError(false);
       }
     }
-  }, [selected, requireContiguous, isContiguous, hasContiguityError, showError, displayError, calculateCheckinCheckout]);
+  }, [selectedDays, requireContiguous, isContiguous, hasContiguityError, showError, displayError, calculateCheckinCheckout]);
 
   // Cleanup timeouts on unmount
   useEffect(() => {
@@ -394,7 +426,7 @@ export default function DaySelector(props) {
           {/* Days Grid */}
           <div className="days-grid">
             {DAY_ABBREVIATIONS.map((dayAbbr, index) => {
-              const isActive = selected.includes(index);
+              const isActive = selectedDays.includes(index);
 
               return (
                 <button
@@ -419,7 +451,7 @@ export default function DaySelector(props) {
         </div>
 
         {/* Check-in/Check-out Display - Advanced with wrap-around support */}
-        {selected.length > 0 && checkIn && checkOut && (
+        {selectedDays.length > 0 && checkIn && checkOut && (
           <div className="info-container">
             <div className="info-text">
               Check-in: <strong>{checkIn}</strong> • Check-out: <strong>{checkOut}</strong>

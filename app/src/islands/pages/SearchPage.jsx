@@ -53,10 +53,10 @@ function MobileFilterBar({ onFilterClick, onMapClick }) {
 
 /**
  * FilterPanel - Left sidebar with filters
+ * NOTE: selectedDays removed - DaySelector is now self-managing with URL sync
  */
 function FilterPanel({
   isActive,
-  selectedDays,
   onDaysChange,
   boroughs,
   selectedBorough,
@@ -100,10 +100,9 @@ function FilterPanel({
       <div className="filter-container">
         {/* Single Horizontal Filter Row - All filters inline */}
         <div className="horizontal-filters">
-          {/* Day Selector */}
+          {/* Day Selector - Self-managing with URL synchronization */}
           <div className="filter-group compact day-selector-group">
             <DaySelector
-              selected={selectedDays}
               onChange={onDaysChange}
               label="Select Days"
             />
@@ -673,7 +672,8 @@ export default function SearchPage() {
   const urlFilters = parseUrlToFilters();
 
   // Filter state (initialized from URL if available)
-  const [selectedDays, setSelectedDays] = useState(urlFilters.selectedDays);
+  // NOTE: selectedDays now managed by DaySelector component (self-managing with URL sync)
+  const [selectedDays, setSelectedDays] = useState(urlFilters.selectedDays); // Kept for callbacks only
   const [boroughs, setBoroughs] = useState([]);
   const [selectedBorough, setSelectedBorough] = useState(urlFilters.selectedBorough);
   const [neighborhoods, setNeighborhoods] = useState([]);
@@ -687,9 +687,6 @@ export default function SearchPage() {
   const [filterPanelActive, setFilterPanelActive] = useState(false);
   const [mapSectionActive, setMapSectionActive] = useState(false);
 
-  // Flag to prevent URL update on initial load
-  const isInitialMount = useRef(true);
-
   // Initialize data lookups on mount
   useEffect(() => {
     const init = async () => {
@@ -702,33 +699,27 @@ export default function SearchPage() {
   }, []);
 
   // Sync filter state to URL parameters
+  // NOTE: selectedDays URL sync now handled by DaySelector component
   useEffect(() => {
-    // Skip URL update on initial mount (URL already parsed)
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      return;
-    }
+    // Update URL with current filter state (excluding selectedDays)
+    const filters = parseUrlToFilters(); // Get current URL filters including days
+    filters.selectedBorough = selectedBorough;
+    filters.weekPattern = weekPattern;
+    filters.priceTier = priceTier;
+    filters.sortBy = sortBy;
+    filters.selectedNeighborhoods = selectedNeighborhoods;
 
-    // Update URL with current filter state
-    const filters = {
-      selectedDays,
-      selectedBorough,
-      weekPattern,
-      priceTier,
-      sortBy,
-      selectedNeighborhoods
-    };
-
-    updateUrlParams(filters, false); // false = push new history entry
-  }, [selectedDays, selectedBorough, weekPattern, priceTier, sortBy, selectedNeighborhoods]);
+    updateUrlParams(filters, true); // true = replace history entry (avoid duplicates)
+  }, [selectedBorough, weekPattern, priceTier, sortBy, selectedNeighborhoods]);
 
   // Watch for browser back/forward navigation
+  // NOTE: selectedDays now handled by DaySelector component's own URL sync
   useEffect(() => {
     const cleanup = watchUrlChanges((newFilters) => {
       console.log('URL changed via browser navigation, updating filters:', newFilters);
 
-      // Update all filter states from URL
-      setSelectedDays(newFilters.selectedDays);
+      // Update filter states from URL (excluding selectedDays - managed by DaySelector)
+      setSelectedDays(newFilters.selectedDays); // Keep in sync for local state
       setSelectedBorough(newFilters.selectedBorough);
       setWeekPattern(newFilters.weekPattern);
       setPriceTier(newFilters.priceTier);
@@ -1183,7 +1174,6 @@ export default function SearchPage() {
 
       <FilterPanel
         isActive={filterPanelActive}
-        selectedDays={selectedDays}
         onDaysChange={setSelectedDays}
         boroughs={boroughs}
         selectedBorough={selectedBorough}
