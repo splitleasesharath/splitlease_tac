@@ -102,12 +102,87 @@ def commit_changes(
     message: str, cwd: Optional[str] = None
 ) -> Tuple[bool, Optional[str]]:
     """Stage all changes and commit. Returns (success, error_message)."""
+    import os
+    import pathlib
+
     # Check if there are changes to commit
     result = subprocess.run(
         ["git", "status", "--porcelain"], capture_output=True, text=True, encoding='utf-8', cwd=cwd
     )
     if not result.stdout.strip():
         return True, None  # No changes to commit
+
+    # Windows reserved device names (case-insensitive)
+    RESERVED_NAMES = {
+        'con', 'prn', 'aux', 'nul',
+        'com1', 'com2', 'com3', 'com4', 'com5', 'com6', 'com7', 'com8', 'com9',
+        'lpt1', 'lpt2', 'lpt3', 'lpt4', 'lpt5', 'lpt6', 'lpt7', 'lpt8', 'lpt9'
+    }
+
+    # Parse git status to find files with reserved names and remove them BEFORE git add
+    logger = logging.getLogger(__name__)
+    files_to_remove = []
+
+    for line in result.stdout.strip().split('\n'):
+        if not line or len(line) <= 3:
+            continue
+        # Git status format: "XY filename" where XY is status code
+        filepath = line[3:].strip()
+        # Remove quotes if present
+        if filepath.startswith('"') and filepath.endswith('"'):
+            filepath = filepath[1:-1]
+
+        # Check if filename matches reserved name
+        filename = os.path.basename(filepath)
+        name_lower = filename.lower()
+        name_without_ext = pathlib.Path(filename).stem.lower()
+
+        if name_lower in RESERVED_NAMES or name_without_ext in RESERVED_NAMES:
+            files_to_remove.append(filepath)
+
+    # Remove reserved device name files using git bash rm command
+    # This avoids the Windows path resolution issue
+    if files_to_remove:
+        logger.warning(
+            f"Found {len(files_to_remove)} Windows reserved device name file(s). "
+            f"These will be removed: {files_to_remove}"
+        )
+
+        for filepath in files_to_remove:
+            # Use Git Bash's rm command which can handle these files
+            # The key is to use the relative path from cwd
+            rm_result = subprocess.run(
+                ["rm", "-f", filepath],
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
+                cwd=cwd,
+                shell=False
+            )
+
+            if rm_result.returncode == 0:
+                logger.info(f"Removed reserved device name file: {filepath}")
+            else:
+                # If rm fails, try with bash -c to ensure we're using Git Bash
+                bash_result = subprocess.run(
+                    ["bash", "-c", f"rm -f '{filepath}'"],
+                    capture_output=True,
+                    text=True,
+                    encoding='utf-8',
+                    cwd=cwd
+                )
+
+                if bash_result.returncode == 0:
+                    logger.info(f"Removed reserved device name file using bash: {filepath}")
+                else:
+                    logger.error(
+                        f"Failed to remove reserved device name file '{filepath}': "
+                        f"rm: {rm_result.stderr}, bash: {bash_result.stderr}"
+                    )
+                    return False, (
+                        f"Cannot remove Windows reserved device name file: {filepath}. "
+                        f"Please manually remove this file and try again."
+                    )
 
     # Stage all changes
     result = subprocess.run(

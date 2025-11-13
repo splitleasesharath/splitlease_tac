@@ -86,3 +86,14 @@ dump/
 # Playwright MCP directory
 .playwright/
 playwright-mcp/
+
+# Windows reserved device names - prevent accidental commits
+# These can be created by shell redirections but should never be in git
+nul
+NUL
+con
+CON
+prn
+PRN
+aux
+AUX
