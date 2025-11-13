@@ -39,12 +39,13 @@ export function parseUrlToFilters() {
 
 /**
  * Parse days parameter from URL
- * Format: "1,2,3,4,5" (comma-separated day indices)
+ * Format: "1,2,3,4,5" (comma-separated day indices, 0-based: 0=Sunday, 6=Saturday)
+ * Validates and deduplicates day indices, filtering out invalid values
  * @param {string|null} daysParam - The days parameter from URL
  * @returns {Array<number>} Array of day indices (0-6)
  */
 function parseDaysParam(daysParam) {
-  if (!daysParam) {
+  if (!daysParam || daysParam.trim() === '') {
     return DEFAULTS.DEFAULT_SELECTED_DAYS;
   }
 
@@ -52,9 +53,23 @@ function parseDaysParam(daysParam) {
     const days = daysParam
       .split(',')
       .map(d => parseInt(d.trim(), 10))
-      .filter(d => !isNaN(d) && d >= 0 && d <= 6);
+      .filter(d => {
+        // Filter out NaN and out-of-range values
+        if (isNaN(d) || d < 0 || d > 6) {
+          // Log warning in development mode
+          if (import.meta.env.DEV) {
+            console.warn(`Invalid day index in URL: ${d}. Must be 0-6.`);
+          }
+          return false;
+        }
+        return true;
+      });
 
-    return days.length > 0 ? days : DEFAULTS.DEFAULT_SELECTED_DAYS;
+    // Deduplicate values using Set
+    const uniqueDays = [...new Set(days)];
+
+    // Return unique days if valid, otherwise return default
+    return uniqueDays.length > 0 ? uniqueDays : DEFAULTS.DEFAULT_SELECTED_DAYS;
   } catch (error) {
     console.error('Failed to parse days parameter:', error);
     return DEFAULTS.DEFAULT_SELECTED_DAYS;
