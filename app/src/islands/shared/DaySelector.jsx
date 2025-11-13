@@ -15,6 +15,7 @@ import { DAY_ABBREVIATIONS, DAY_NAMES } from '../../lib/constants.js';
  * - Advanced check-in/check-out calculation with wrap-around
  * - Visual error styling on day cells
  * - onError callback for parent notification
+ * - URL parameter synchronization support
  *
  * Features:
  * - Purple gradient card wrapper (135deg, #667eea to #764ba2)
@@ -22,13 +23,22 @@ import { DAY_ABBREVIATIONS, DAY_NAMES } from '../../lib/constants.js';
  * - Check-in/Check-out display
  * - Clear selection button
  * - Visual indication of selected/unselected state
+ * - Component-level default selection (Monday-Friday)
  *
  * Day numbering (matching constants.js):
  * - Sunday = 0, Monday = 1, Tuesday = 2, Wednesday = 3, Thursday = 4, Friday = 5, Saturday = 6
  *
+ * URL Synchronization:
+ * This component is a controlled component that works with URL parameters.
+ * Parent pages should:
+ * 1. Parse URL parameters on mount and pass to `selected` prop
+ * 2. Listen to `onChange` and update URL parameters accordingly
+ * 3. The component provides a `defaultSelected` prop for initial state
+ *
  * @param {Object} props
- * @param {number[]} props.selected - Array of selected day numbers (0-6, where 0=Sunday)
+ * @param {number[]} props.selected - Array of selected day numbers (0-6, where 0=Sunday). This is a controlled prop.
  * @param {Function} props.onChange - Callback function: (selectedDays: number[]) => void
+ * @param {number[]} [props.defaultSelected=[1,2,3,4,5]] - Default selection (Monday-Friday) when no selection is provided
  * @param {Function} [props.onError] - Callback when validation error occurs: (errorMessage: string) => void
  * @param {string} [props.label] - Optional label text to display above selector
  * @param {string} [props.className] - Optional additional CSS classes
@@ -40,6 +50,7 @@ export default function DaySelector(props) {
   const {
     selected = [],
     onChange,
+    defaultSelected = [1, 2, 3, 4, 5], // Monday-Friday (0-based indexing)
     onError,
     label,
     className = '',
