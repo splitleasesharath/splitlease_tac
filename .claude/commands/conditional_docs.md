@@ -100,3 +100,14 @@ When implementing solutions, prioritize authenticity and appropriate scale over 
     - When troubleshooting Header component styling, dropdowns, or mobile menu
     - When implementing accessibility features (WCAG 2.1 AA compliance)
     - When working with data attribute parsing for island mounting
+
+- app_docs/feature-4-search-schedule-defaults.md
+  - Conditions:
+    - When working with the DaySelector component
+    - When implementing URL parameter synchronization for component state
+    - When working with day/schedule selection functionality
+    - When implementing HomePage to SearchPage navigation with parameters
+    - When troubleshooting day selection not persisting in URLs
+    - When converting between different day indexing systems (0-based vs 1-based)
+    - When implementing self-managing React components with URL state
+    - When working with search filters or day-based rental queries
