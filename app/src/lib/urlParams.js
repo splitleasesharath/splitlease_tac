@@ -39,7 +39,9 @@ export function parseUrlToFilters() {
 
 /**
  * Parse days parameter from URL
- * Format: "1,2,3,4,5" (comma-separated day indices)
+ * Format: "1,2,3,4,5" (comma-separated day indices, 0-based)
+ * Day numbering: 0=Sunday, 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday, 6=Saturday
+ * Example: "1,2,3,4,5" represents Monday-Friday
  * @param {string|null} daysParam - The days parameter from URL
  * @returns {Array<number>} Array of day indices (0-6)
  */
@@ -49,10 +51,11 @@ function parseDaysParam(daysParam) {
   }
 
   try {
+    // Parse comma-separated day indices (0-based)
     const days = daysParam
       .split(',')
       .map(d => parseInt(d.trim(), 10))
-      .filter(d => !isNaN(d) && d >= 0 && d <= 6);
+      .filter(d => !isNaN(d) && d >= 0 && d <= 6); // Valid range: 0-6
 
     return days.length > 0 ? days : DEFAULTS.DEFAULT_SELECTED_DAYS;
   } catch (error) {
@@ -94,6 +97,7 @@ export function serializeFiltersToUrl(filters) {
   const params = new URLSearchParams();
 
   // Add days-selected parameter (only if not default)
+  // Format: comma-separated day indices (0-based, e.g., "1,2,3,4,5" for Monday-Friday)
   if (filters.selectedDays && filters.selectedDays.length > 0) {
     const daysString = filters.selectedDays.join(',');
     const defaultDaysString = DEFAULTS.DEFAULT_SELECTED_DAYS.join(',');
