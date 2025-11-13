@@ -100,3 +100,12 @@ When implementing solutions, prioritize authenticity and appropriate scale over 
     - When troubleshooting Header component styling, dropdowns, or mobile menu
     - When implementing accessibility features (WCAG 2.1 AA compliance)
     - When working with data attribute parsing for island mounting
+
+- app_docs/feature-0b90bdb0-search-schedule-url-defaults.md
+  - Conditions:
+    - When working with the DaySelector/schedule selector component
+    - When implementing URL parameter synchronization for UI components
+    - When troubleshooting schedule selection persistence or default values
+    - When working with search page filters or state management
+    - When implementing shareable/bookmarkable URL functionality
+    - When updating HomePage to SearchPage navigation or redirects
