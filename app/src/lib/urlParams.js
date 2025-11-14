@@ -137,13 +137,80 @@ export function serializeFiltersToUrl(filters) {
 /**
  * Update browser URL without page reload
  * Uses History API to maintain browser navigation
+ * Preserves existing URL parameters that aren't being updated (e.g., days-selected managed by DaySelector)
  * @param {object} filters - Filter state object
  * @param {boolean} replace - If true, replaces current history entry instead of pushing new one
  */
 export function updateUrlParams(filters, replace = false) {
   if (typeof window === 'undefined') return;
 
-  const queryString = serializeFiltersToUrl(filters);
+  // Start with existing URL parameters to preserve parameters managed by other components
+  const params = new URLSearchParams(window.location.search);
+
+  // Update only the parameters that are in the filters object
+  // This preserves parameters like 'days-selected' that might be managed by DaySelector
+
+  // Update days-selected parameter (only if included in filters)
+  if (filters.selectedDays !== undefined) {
+    if (filters.selectedDays && filters.selectedDays.length > 0) {
+      const daysString = filters.selectedDays.join(',');
+      const defaultDaysString = DEFAULTS.DEFAULT_SELECTED_DAYS.join(',');
+      if (daysString !== defaultDaysString) {
+        params.set('days-selected', daysString);
+      } else {
+        params.delete('days-selected');
+      }
+    } else {
+      params.delete('days-selected');
+    }
+  }
+
+  // Update borough parameter (only if included in filters)
+  if (filters.selectedBorough !== undefined) {
+    if (filters.selectedBorough && filters.selectedBorough !== DEFAULTS.DEFAULT_BOROUGH) {
+      params.set('borough', filters.selectedBorough);
+    } else {
+      params.delete('borough');
+    }
+  }
+
+  // Update week pattern parameter (only if included in filters)
+  if (filters.weekPattern !== undefined) {
+    if (filters.weekPattern && filters.weekPattern !== DEFAULTS.DEFAULT_WEEK_PATTERN) {
+      params.set('weekly-frequency', filters.weekPattern);
+    } else {
+      params.delete('weekly-frequency');
+    }
+  }
+
+  // Update price tier parameter (only if included in filters)
+  if (filters.priceTier !== undefined) {
+    if (filters.priceTier && filters.priceTier !== DEFAULTS.DEFAULT_PRICE_TIER) {
+      params.set('pricetier', filters.priceTier);
+    } else {
+      params.delete('pricetier');
+    }
+  }
+
+  // Update sort parameter (only if included in filters)
+  if (filters.sortBy !== undefined) {
+    if (filters.sortBy && filters.sortBy !== DEFAULTS.DEFAULT_SORT_BY) {
+      params.set('sort', filters.sortBy);
+    } else {
+      params.delete('sort');
+    }
+  }
+
+  // Update neighborhoods parameter (only if included in filters)
+  if (filters.selectedNeighborhoods !== undefined) {
+    if (filters.selectedNeighborhoods && filters.selectedNeighborhoods.length > 0) {
+      params.set('neighborhoods', filters.selectedNeighborhoods.join(','));
+    } else {
+      params.delete('neighborhoods');
+    }
+  }
+
+  const queryString = params.toString();
   const newUrl = queryString
     ? `${window.location.pathname}?${queryString}`
     : window.location.pathname;

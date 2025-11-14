@@ -702,8 +702,7 @@ export default function SearchPage() {
   }, []);
 
   // Sync filter state to URL parameters
-  // NOTE: selectedDays is still passed to preserve the days-selected URL parameter,
-  // but DaySelector component is the source of truth and handles the actual URL updates
+  // NOTE: selectedDays is excluded because DaySelector component handles its own URL synchronization
   useEffect(() => {
     // Skip URL update on initial mount (URL already parsed)
     if (isInitialMount.current) {
@@ -711,9 +710,8 @@ export default function SearchPage() {
       return;
     }
 
-    // Update URL with current filter state (including selectedDays to preserve it in URL)
+    // Update URL with current filter state (excluding selectedDays since DaySelector handles it)
     const filters = {
-      selectedDays,
       selectedBorough,
       weekPattern,
       priceTier,
@@ -722,7 +720,7 @@ export default function SearchPage() {
     };
 
     updateUrlParams(filters, false); // false = push new history entry
-  }, [selectedDays, selectedBorough, weekPattern, priceTier, sortBy, selectedNeighborhoods]);
+  }, [selectedBorough, weekPattern, priceTier, sortBy, selectedNeighborhoods]);
 
   // Watch for browser back/forward navigation
   useEffect(() => {
