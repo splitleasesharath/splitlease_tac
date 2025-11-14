@@ -11,15 +11,6 @@ review_image_dir: `<absolute path to codebase>/agents/<adw_id>/<agent_name>/revi
 
 ## Instructions
 
-- **IMPORTANT: Execute `/no_fallback_check` FIRST** to scan for fallback mechanisms and hardcoded data
-  - **DO NOT return the no_fallback_check report as your final output**
-  - **Extract any blocking issues** from the report and add them to your review_issues array with:
-    - `issue_type`: 'fallback_mechanism' or 'hardcoded_data'
-    - `issue_severity`: Based on the report's assessment
-    - `issue_description`: The fallback/hardcoded data found
-    - `issue_resolution`: How to fix it
-  - **If no_fallback_check finds no issues**, note this internally and continue with the review
-  - **Continue to the next steps** after processing no_fallback_check results
 - Check current git branch using `git branch` to understand context
 - Run `git diff origin/main` to see all changes made in current branch. Continue even if there are no changes related to the spec file.
 - Find the spec file by looking for specs/*.md files in the diff that match the current branch name
@@ -83,7 +74,7 @@ IMPORTANT: Read and **Execute** `.claude/commands/prepare_app.md` now to prepare
             "issue_description": "string - description of the issue",
             "issue_resolution": "string - description of the resolution",
             "issue_severity": "string - severity of the issue between 'skippable', 'tech_debt', 'blocker'",
-            "issue_type": "string - type of issue: 'fallback_mechanism', 'hardcoded_data', 'functional', 'ui', 'performance', 'security', or 'other'"
+            "issue_type": "string - type of issue: 'functional', 'ui', 'performance', 'security', or 'other'"
         },
         ...
     ],
@@ -102,17 +93,15 @@ IMPORTANT: Read and **Execute** `.claude/commands/prepare_app.md` now to prepare
 **YOUR ENTIRE RESPONSE MUST BE VALID JSON MATCHING THE OUTPUT STRUCTURE ABOVE.**
 
 **DO NOT:**
-- ❌ Return the no_fallback_check markdown report as your output
 - ❌ Return any markdown, explanations, summaries, or headers
 - ❌ Use markdown code fences like ```json or ```
 - ❌ Add any text before or after the JSON
 - ❌ Return incomplete JSON or work-in-progress messages
 
 **YOU MUST:**
-- ✅ Complete the ENTIRE review process (no_fallback_check → git diff → spec analysis → UI validation → screenshots)
+- ✅ Complete the ENTIRE review process (git diff → spec analysis → UI validation → screenshots)
 - ✅ Return ONLY raw JSON with no markdown formatting
 - ✅ Include all screenshot paths in the screenshots array
-- ✅ Include any fallback/hardcoded data issues found by no_fallback_check in the review_issues array
 - ✅ Ensure the JSON is valid and parseable by JSON.parse()
 
 **Example of CORRECT output (exactly like this, nothing else):**
@@ -122,7 +111,7 @@ IMPORTANT: Read and **Execute** `.claude/commands/prepare_app.md` now to prepare
 
 **Example of WRONG output (DO NOT DO THIS):**
 ```
-# Fallback Mechanism Audit Report
+# Review Report
 
 ## Analysis Summary
 ...
@@ -130,5 +119,3 @@ IMPORTANT: Read and **Execute** `.claude/commands/prepare_app.md` now to prepare
 Here's my review in JSON:
 {"success": true, ...}
 ```
-
-**REMEMBER:** If you execute /no_fallback_check, process its findings and then CONTINUE with the rest of the review. Do NOT return the no_fallback_check report as your final output. Your final output is ONLY the JSON structure shown above.
