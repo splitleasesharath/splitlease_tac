@@ -79,3 +79,37 @@ Extract the chore details from the `issue_json` variable (parse the JSON and use
 ## Report
 
 - IMPORTANT: Return exclusively the path to the plan file created and nothing else.
+
+---
+
+# CRITICAL FINAL INSTRUCTIONS
+
+**YOUR ENTIRE RESPONSE MUST BE ONLY THE FILE PATH.**
+
+**DO NOT:**
+- ❌ Return status messages, confirmations, or explanations
+- ❌ Return markdown formatting, headers, or checkmarks (✓)
+- ❌ Return multiple lines of text
+- ❌ Include "/enforce_no_fallback" output in your response
+- ❌ Add any text before or after the file path
+- ❌ Return verbose descriptions of what you did
+
+**YOU MUST:**
+- ✅ Create the spec file in specs/ directory
+- ✅ Return ONLY the relative file path (e.g., `specs/issue-18-adw-dd13da8e-remove-property-type-fallback.md`)
+- ✅ Ensure the path is a single line with no extra text
+- ✅ No explanations, no status updates, just the path
+
+**Example of CORRECT output (exactly like this, nothing else):**
+```
+specs/issue-18-adw-dd13da8e-sdlc_planner-update-readme.md
+```
+
+**Example of WRONG output (DO NOT DO THIS):**
+```
+✓ No fallback principle enforcement check complete
+✓ Task objective is to REMOVE a fallback mechanism
+✓ Ready to proceed with authentic solution
+```
+
+**REMEMBER:** After executing /enforce_no_fallback and creating the plan file, return ONLY the file path. Nothing else.

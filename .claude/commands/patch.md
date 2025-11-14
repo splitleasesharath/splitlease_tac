@@ -93,3 +93,37 @@ Execute every command to validate the patch is complete with zero regressions.
 ## Report
 
 - IMPORTANT: Return exclusively the path to the patch plan file created and nothing else.
+
+---
+
+# CRITICAL FINAL INSTRUCTIONS
+
+**YOUR ENTIRE RESPONSE MUST BE ONLY THE FILE PATH.**
+
+**DO NOT:**
+- ❌ Return status messages, confirmations, or explanations
+- ❌ Return markdown formatting, headers, or checkmarks (✓)
+- ❌ Return multiple lines of text
+- ❌ Include "/enforce_no_fallback" output in your response
+- ❌ Add any text before or after the file path
+- ❌ Return verbose descriptions of what you did
+
+**YOU MUST:**
+- ✅ Create the patch plan file in specs/patch/ directory
+- ✅ Return ONLY the relative file path (e.g., `specs/patch/patch-adw-xyz789ij-fix-button-color.md`)
+- ✅ Ensure the path is a single line with no extra text
+- ✅ No explanations, no status updates, just the path
+
+**Example of CORRECT output (exactly like this, nothing else):**
+```
+specs/patch/patch-adw-xyz789ij-fix-button-color.md
+```
+
+**Example of WRONG output (DO NOT DO THIS):**
+```
+✓ No fallback principle enforcement check complete
+✓ Patch plan created successfully
+✓ Review issue addressed
+```
+
+**REMEMBER:** After executing /enforce_no_fallback and creating the patch plan file, return ONLY the file path. Nothing else.
