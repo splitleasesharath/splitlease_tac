@@ -8,6 +8,12 @@
 
 This feature enhances the Search Schedule Selector (DaySelector) shared React component to default to Monday-Friday selections, synchronize user selections with URL parameters for shareable search links, and ensure schedule selections persist across page navigation. The implementation enables users to bookmark and share search URLs with specific schedule filters while maintaining backward compatibility with existing component usage.
 
+## Screenshots
+
+![Search Page Initial Load with Monday-Friday Default Selection](assets/01_search_page_initial_load.png)
+
+The screenshot above shows the search page on initial load, demonstrating the default Monday-Friday schedule selection and the `days-selected=1,2,3,4,5` URL parameter in the address bar.
+
 ## What Was Built
 
 - **URL Parameter Synchronization in DaySelector**: Added optional `enableUrlSync` prop to enable reading from and writing to the `days-selected` URL parameter
