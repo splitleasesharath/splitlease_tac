@@ -103,9 +103,9 @@ function FilterPanel({
           {/* Day Selector */}
           <div className="filter-group compact day-selector-group">
             <DaySelector
-              selected={selectedDays}
               onChange={onDaysChange}
               label="Select Days"
+              enableUrlSync={true}
             />
           </div>
 
@@ -702,6 +702,7 @@ export default function SearchPage() {
   }, []);
 
   // Sync filter state to URL parameters
+  // NOTE: selectedDays is excluded because DaySelector component handles its own URL synchronization
   useEffect(() => {
     // Skip URL update on initial mount (URL already parsed)
     if (isInitialMount.current) {
@@ -709,9 +710,8 @@ export default function SearchPage() {
       return;
     }
 
-    // Update URL with current filter state
+    // Update URL with current filter state (excluding selectedDays since DaySelector handles it)
     const filters = {
-      selectedDays,
       selectedBorough,
       weekPattern,
       priceTier,
@@ -720,7 +720,7 @@ export default function SearchPage() {
     };
 
     updateUrlParams(filters, false); // false = push new history entry
-  }, [selectedDays, selectedBorough, weekPattern, priceTier, sortBy, selectedNeighborhoods]);
+  }, [selectedBorough, weekPattern, priceTier, sortBy, selectedNeighborhoods]);
 
   // Watch for browser back/forward navigation
   useEffect(() => {
