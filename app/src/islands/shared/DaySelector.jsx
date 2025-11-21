@@ -23,8 +23,21 @@ import { DAY_ABBREVIATIONS, DAY_NAMES } from '../../lib/constants.js';
  * - Clear selection button
  * - Visual indication of selected/unselected state
  *
- * Day numbering (matching constants.js):
- * - Sunday = 0, Monday = 1, Tuesday = 2, Wednesday = 3, Thursday = 4, Friday = 5, Saturday = 6
+ * URL Synchronization:
+ * - This is a CONTROLLED component - the parent manages state and URL synchronization
+ * - SearchPage handles URL parameter reading/writing via urlParams.js utilities
+ * - URL parameter format: ?days-selected=1,2,3,4,5 (0-based, comma-separated)
+ * - Default selection: [1,2,3,4,5] (Monday-Friday) when no URL parameter present
+ * - See urlParams.js for URL parsing/serialization details
+ *
+ * Day numbering (0-based indexing matching JavaScript Date.getDay()):
+ * - 0 = Sunday
+ * - 1 = Monday
+ * - 2 = Tuesday
+ * - 3 = Wednesday
+ * - 4 = Thursday
+ * - 5 = Friday
+ * - 6 = Saturday
  *
  * @param {Object} props
  * @param {number[]} props.selected - Array of selected day numbers (0-6, where 0=Sunday)
@@ -35,6 +48,23 @@ import { DAY_ABBREVIATIONS, DAY_NAMES } from '../../lib/constants.js';
  * @param {number} [props.minDays=3] - Minimum number of nights required (nights = days - 1)
  * @param {boolean} [props.requireContiguous=true] - Whether days must be contiguous
  * @returns {JSX.Element}
+ *
+ * @example
+ * // Basic usage in SearchPage (with URL synchronization)
+ * <DaySelector
+ *   selected={selectedDays}
+ *   onChange={setSelectedDays}
+ *   label="Select Days"
+ * />
+ *
+ * @example
+ * // Custom minimum nights requirement
+ * <DaySelector
+ *   selected={selectedDays}
+ *   onChange={setSelectedDays}
+ *   minDays={5}
+ *   label="Select at least 4 nights"
+ * />
  */
 export default function DaySelector(props) {
   const {
